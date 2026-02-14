@@ -1,9 +1,10 @@
+import { Suspense } from "react";
 import LotMap from "@/components/LotMap";
 import Legend from "@/components/Legend";
 
 export default function Home() {
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-white">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-4 py-4 sm:px-6 lg:px-8">
         <div className="max-w-screen-2xl mx-auto">
@@ -26,7 +27,9 @@ export default function Home() {
       {/* Map */}
       <div className="px-4 py-4 sm:px-6 lg:px-8">
         <div className="max-w-screen-2xl mx-auto">
-          <LotMap />
+          <Suspense>
+            <LotMap />
+          </Suspense>
         </div>
       </div>
     </main>
