@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { lots, Lot, Linea, statusColors } from "@/data/lots";
 import LotCircle from "./LotCircle";
 import LotDetailPanel from "./LotDetailPanel";
+import Legend from "./Legend";
 
 // ── DEBUG MODE — set to false after calibration ──
 const DEBUG_COORDS = false;
@@ -53,7 +54,7 @@ export default function LotMap() {
   const initialLotId = searchParams.get("lote");
   const initialLot = initialLotId
     ? lots.find((l) => l.id === Number(initialLotId)) ?? null
-    : lots.find((l) => l.id === 1) ?? null;
+    : null;
 
   const [selectedLot, setSelectedLot] = useState<Lot | null>(initialLot);
   const [hoveredLot, setHoveredLot] = useState<Lot | null>(null);
@@ -105,63 +106,89 @@ export default function LotMap() {
   const matchCount = hasActiveFilter ? lots.filter((l) => matchesFilter(l, filterLinea, filterPrice)).length : 0;
 
   return (
-    <div className="flex flex-col lg:flex-row gap-0 lg:gap-4">
-      {/* Map area */}
-      <div className="flex-1 min-w-0">
-        {/* ── Filters ────────────────────────────────────── */}
-        <div className="mb-3 space-y-2">
-          {/* Línea filter */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-1">Ubicación</span>
-            {LINEA_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => setFilterLinea(filterLinea === opt.value ? "all" : opt.value)}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                  filterLinea === opt.value
-                    ? "bg-gray-900 text-white"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}
-              >
-                {opt.label}
-              </button>
-            ))}
+    <>
+      {/* ── Header ── */}
+      <header className="sticky top-0 z-30 bg-white border-b border-gray-200">
+        {/* Row 1: Title + Legend */}
+        <div className="px-4 sm:px-6 lg:px-8 py-3 border-b border-gray-100">
+          <div className="max-w-screen-2xl mx-auto flex items-center justify-between">
+            <h1 className="text-lg sm:text-xl font-bold text-gray-900">
+              Mirador Alto Colbún
+            </h1>
+            <Legend />
           </div>
-
-          {/* Price filter */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-1">Precio</span>
-            {PRICE_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => setFilterPrice(filterPrice === opt.value ? "all" : opt.value)}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                  filterPrice === opt.value
-                    ? "bg-gray-900 text-white"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Active filter indicator */}
-          {hasActiveFilter && (
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-500">
-                {matchCount} lote{matchCount !== 1 ? "s" : ""} coinciden
-              </span>
-              <button
-                onClick={() => { setFilterLinea("all"); setFilterPrice("all"); }}
-                className="text-xs text-red-600 hover:text-red-700 font-medium"
-              >
-                Limpiar filtros
-              </button>
-            </div>
-          )}
         </div>
 
+        {/* Row 2: Filters */}
+        <div className="px-4 sm:px-6 lg:px-8 py-2.5 bg-gray-50">
+          <div className="max-w-screen-2xl mx-auto flex flex-wrap items-center gap-x-6 gap-y-2">
+            {/* Ubicación */}
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Ubicación</span>
+              <div className="flex gap-1">
+                {LINEA_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setFilterLinea(filterLinea === opt.value ? "all" : opt.value)}
+                    className={`w-[108px] py-1 rounded-full text-[11px] font-medium text-center transition-colors ${
+                      filterLinea === opt.value
+                        ? "bg-gray-900 text-white"
+                        : "bg-white text-gray-500 hover:bg-gray-100 border border-gray-200"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Separador */}
+            <div className="hidden sm:block w-px h-5 bg-gray-200" />
+
+            {/* Precio */}
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Precio</span>
+              <div className="flex gap-1">
+                {PRICE_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setFilterPrice(filterPrice === opt.value ? "all" : opt.value)}
+                    className={`w-[108px] py-1 rounded-full text-[11px] font-medium text-center transition-colors ${
+                      filterPrice === opt.value
+                        ? "bg-gray-900 text-white"
+                        : "bg-white text-gray-500 hover:bg-gray-100 border border-gray-200"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Active filter indicator */}
+            {hasActiveFilter && (
+              <>
+                <div className="hidden sm:block w-px h-5 bg-gray-200" />
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] text-gray-500">
+                    {matchCount} sitio{matchCount !== 1 ? "s" : ""} coinciden
+                  </span>
+                  <button
+                    onClick={() => { setFilterLinea("all"); setFilterPrice("all"); }}
+                    className="text-[11px] text-red-600 hover:text-red-700 font-medium"
+                  >
+                    Limpiar
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </header>
+
+    <div className="flex flex-col lg:flex-row gap-0 lg:gap-4 px-4 py-4 sm:px-6 lg:px-8">
+      {/* Map area */}
+      <div className="flex-1 min-w-0 max-w-screen-2xl mx-auto w-full">
         <div className="w-full overflow-hidden">
         <div
           className="relative w-full"
@@ -170,7 +197,7 @@ export default function LotMap() {
           {/* Background image */}
           <img
             src="/plano-base.png"
-            alt="Plano de lotes"
+            alt="Plano Mirador Alto Colbún"
             className="absolute inset-0 w-full h-full object-contain"
             draggable={false}
           />
@@ -264,7 +291,7 @@ export default function LotMap() {
               }}
             >
               <div className="bg-gray-900/90 text-white rounded-lg px-3 py-2 text-xs whitespace-nowrap shadow-lg backdrop-blur-sm">
-                <div className="font-bold text-sm mb-0.5">Lote {hoveredLot.id}</div>
+                <div className="font-bold text-sm mb-0.5">Sitio {hoveredLot.id}</div>
                 <div className="text-gray-300">{hoveredLot.superficie.toLocaleString("es-CL")} m² · {hoveredLot.linea ?? "Otros"}</div>
                 {hoveredLot.estado === "Disponible" && (
                   <div className="text-green-400 font-semibold">{hoveredLot.precio.toLocaleString("es-CL")} UF</div>
@@ -301,12 +328,89 @@ export default function LotMap() {
         </div>
       </div>
 
-      {/* Detail panel */}
-      {selectedLot && (
-        <div className="lg:w-96 lg:flex-shrink-0">
+      {/* Detail panel or welcome card */}
+      <div className="lg:w-96 lg:flex-shrink-0">
+        {selectedLot ? (
           <LotDetailPanel lot={selectedLot} onClose={handleClose} />
-        </div>
-      )}
+        ) : (
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden lg:sticky lg:top-4">
+            {/* Header */}
+            <div className="bg-gradient-to-br from-green-600 to-green-700 px-5 py-6 text-white">
+              <h2 className="text-lg font-bold">Bienvenido a Mirador Alto Colbún</h2>
+              <p className="text-sm text-white/80 mt-1">Explora los sitios disponibles en el plano interactivo</p>
+            </div>
+
+            <div className="p-5 space-y-5">
+              {/* Steps */}
+              <div className="space-y-4">
+                <WelcomeStep
+                  number={1}
+                  title="Explora el plano"
+                  description="Pasa el cursor sobre los círculos numerados para ver un resumen rápido de cada sitio."
+                />
+                <WelcomeStep
+                  number={2}
+                  title="Selecciona un sitio"
+                  description="Haz clic en cualquier sitio para ver su ficha completa con superficie, precio, ubicación y más."
+                />
+                <WelcomeStep
+                  number={3}
+                  title="Filtra por ubicación o precio"
+                  description="Usa los filtros de arriba del plano para encontrar sitios según tu preferencia. Los que no coincidan se atenúan."
+                />
+                <WelcomeStep
+                  number={4}
+                  title="Consulta por WhatsApp"
+                  description="¿Te interesa un sitio? Desde su ficha puedes contactarnos directamente por WhatsApp."
+                />
+              </div>
+
+              {/* Color legend */}
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                <h3 className="text-xs font-bold text-gray-700 uppercase tracking-wide mb-3">Colores del plano</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-[#16A34A]" />
+                    <span className="text-xs text-gray-600">Disponible</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-[#E65100]" />
+                    <span className="text-xs text-gray-600">Promesado</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-[#1565C0]" />
+                    <span className="text-xs text-gray-600">Reservado</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-[#C62828]" />
+                    <span className="text-xs text-gray-600">Vendido</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tip */}
+              <p className="text-xs text-gray-400 text-center">
+                Haz clic en un sitio del plano para comenzar →
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+    </>
+  );
+}
+
+function WelcomeStep({ number, title, description }: { number: number; title: string; description: string }) {
+  return (
+    <div className="flex gap-3">
+      <span className="flex-shrink-0 w-7 h-7 rounded-full bg-green-600 text-white text-xs font-bold flex items-center justify-center mt-0.5">
+        {number}
+      </span>
+      <div>
+        <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
+        <p className="text-xs text-gray-500 leading-relaxed mt-0.5">{description}</p>
+      </div>
     </div>
   );
 }

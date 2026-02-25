@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Lotes Lago - Proyecto Inmobiliario",
-  description: "Plano interactivo de lotes junto al lago. Explore disponibilidad, superficies y ubicación.",
+  title: "Mirador Alto Colbún - Plano Interactivo",
+  description: "Plano interactivo del condominio Mirador Alto Colbún. Explore disponibilidad, superficies y ubicación de cada sitio.",
 };
 
 export default function RootLayout({

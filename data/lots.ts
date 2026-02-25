@@ -13,7 +13,9 @@ export interface Lot {
   formaPago: string;
   oferta: string | null;
   tieneCasa: boolean;
+  descripcionCasa: string | null;
   familiaPropietaria: string | null;
+  notasGenerales: string | null;
 }
 
 // ── SVG overlay (viewBox 850×1100, matches plano-base.png 5100×6600) ──
@@ -188,7 +190,9 @@ function buildLot(base: { id: number; superficie: number; estado: LotStatus; pre
       : "Contado · Crédito hipotecario · 36 cuotas",
     oferta: isDisponible ? "5% desc. pago contado" : null,
     tieneCasa: casasSet.has(base.id),
+    descripcionCasa: "Por definir",
     familiaPropietaria: isVendido ? (familias[base.id] ?? null) : null,
+    notasGenerales: "Por definir",
   };
 }
 

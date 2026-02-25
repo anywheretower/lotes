@@ -11,7 +11,7 @@ interface LotCircleProps {
   onHoverEnd?: () => void;
 }
 
-const RADIUS = 14;
+const RADIUS = 12;
 
 export default function LotCircle({ lot, isSelected, dimmed, onSelect, onHoverStart, onHoverEnd }: LotCircleProps) {
   const { cx, cy } = lot.coords;
@@ -24,7 +24,7 @@ export default function LotCircle({ lot, isSelected, dimmed, onSelect, onHoverSt
       onMouseLeave={() => onHoverEnd?.()}
       className="cursor-pointer"
       role="button"
-      aria-label={`Lote ${lot.id} - ${lot.estado}`}
+      aria-label={`Sitio ${lot.id} - ${lot.estado}`}
       opacity={dimmed ? 0.2 : 1}
       style={{ transition: "opacity 0.2s" }}
     >
@@ -59,7 +59,7 @@ export default function LotCircle({ lot, isSelected, dimmed, onSelect, onHoverSt
         textAnchor="middle"
         dominantBaseline="central"
         fill="#fff"
-        fontSize={10}
+        fontSize={8.5}
         fontWeight="bold"
         className="pointer-events-none select-none"
       >
