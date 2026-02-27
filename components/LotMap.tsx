@@ -106,9 +106,9 @@ export default function LotMap() {
   const matchCount = hasActiveFilter ? lots.filter((l) => matchesFilter(l, filterLinea, filterPrice)).length : 0;
 
   return (
-    <>
+    <div className="lg:h-full lg:flex lg:flex-col lg:overflow-hidden">
       {/* ── Header ── */}
-      <header className="sticky top-0 z-30 bg-white border-b border-gray-200">
+      <header className="sticky top-0 z-30 bg-white border-b border-gray-200 flex-shrink-0">
         {/* Row 1: Title + Legend */}
         <div className="px-4 sm:px-6 lg:px-8 py-5 border-b border-gray-100">
           <div className="max-w-screen-2xl mx-auto flex items-center justify-between">
@@ -186,13 +186,12 @@ export default function LotMap() {
         </div>
       </header>
 
-    <div className="flex flex-col lg:flex-row gap-0 lg:gap-4 px-4 py-4 sm:px-6 lg:px-8">
+    <div className="flex flex-col lg:flex-row gap-0 lg:gap-4 px-4 py-4 sm:px-6 lg:px-8 lg:flex-1 lg:min-h-0 lg:overflow-hidden">
       {/* Map area */}
-      <div className="flex-1 min-w-0 max-w-screen-2xl mx-auto w-full">
-        <div className="w-full overflow-hidden">
+      <div className="flex-1 min-w-0 max-w-screen-2xl mx-auto w-full lg:h-full lg:overflow-hidden">
+        <div className="w-full overflow-hidden lg:h-full">
         <div
-          className="relative w-full"
-          style={{ aspectRatio: "850 / 1100", marginTop: "-33%", marginBottom: "-8%" }}
+          className="relative w-full aspect-[850/1100] -mt-[33%] -mb-[8%]"
         >
           {/* Background image */}
           <img
@@ -329,11 +328,11 @@ export default function LotMap() {
       </div>
 
       {/* Detail panel or welcome card */}
-      <div className="lg:w-96 lg:flex-shrink-0">
+      <div className="lg:w-96 lg:flex-shrink-0 lg:overflow-y-auto">
         {selectedLot ? (
           <LotDetailPanel lot={selectedLot} onClose={handleClose} />
         ) : (
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden lg:sticky lg:top-4">
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
             {/* Header */}
             <div className="bg-gradient-to-br from-[#3771b3] to-[#2a5a8f] px-5 py-6 text-white">
               <h2 className="text-lg font-bold">Bienvenido a Mirador Alto Colbún</h2>
@@ -399,7 +398,7 @@ export default function LotMap() {
     </div>
 
     {/* ── Footer ── */}
-    <footer className="text-gray-400 text-xs border-t border-gray-200">
+    <footer className="text-gray-400 text-xs border-t border-gray-200 flex-shrink-0">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
         <span>© {new Date().getFullYear()} Mirador Alto Colbún · Lago Colbún, Región del Maule</span>
         <div className="flex items-center gap-4">
@@ -413,7 +412,7 @@ export default function LotMap() {
         </div>
       </div>
     </footer>
-    </>
+    </div>
   );
 }
 
