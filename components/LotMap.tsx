@@ -397,10 +397,10 @@ export default function LotMap() {
           <div className="border border-neutral-100 overflow-hidden">
             {/* Header */}
             <div className="bg-neutral-900 px-5 py-6 text-white">
-              <h2 className="text-lg font-semibold tracking-tight">
+              <h2 className="text-sm font-semibold tracking-tight">
                 Bienvenido a Mirador Alto Colbún
               </h2>
-              <p className="text-sm text-neutral-400 mt-1">Explora los sitios disponibles en el plano interactivo</p>
+              <p className="text-xs text-neutral-400 mt-1">Explora los sitios disponibles en el plano interactivo</p>
             </div>
 
             <div className="p-5 space-y-5">
@@ -467,12 +467,12 @@ export default function LotMap() {
 function WelcomeStep({ number, title, description }: { number: number; title: string; description: string }) {
   return (
     <div className="flex gap-3">
-      <span className="flex-shrink-0 w-6 h-6 bg-neutral-900 text-white text-[10px] font-medium flex items-center justify-center mt-0.5">
+      <span className="flex-shrink-0 w-5 h-5 bg-neutral-900 text-white text-[9px] font-medium flex items-center justify-center mt-0.5">
         {number}
       </span>
       <div>
-        <h3 className="text-sm font-medium text-neutral-900">{title}</h3>
-        <p className="text-xs text-neutral-400 leading-relaxed mt-0.5">{description}</p>
+        <h3 className="text-xs font-medium text-neutral-900">{title}</h3>
+        <p className="text-[11px] text-neutral-400 leading-relaxed mt-0.5">{description}</p>
       </div>
     </div>
   );
