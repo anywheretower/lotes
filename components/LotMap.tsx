@@ -3,8 +3,11 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { lots, Lot, Linea, statusColors } from "@/data/lots";
+import { amenities, Amenity, AMENITY_COLOR } from "@/data/amenities";
 import LotCircle from "./LotCircle";
 import LotDetailPanel from "./LotDetailPanel";
+import AmenityCircle from "./AmenityCircle";
+import AmenityDetailPanel from "./AmenityDetailPanel";
 import Legend from "./Legend";
 
 // ── DEBUG MODE — set to false after calibration ──
@@ -58,6 +61,8 @@ export default function LotMap() {
 
   const [selectedLot, setSelectedLot] = useState<Lot | null>(initialLot);
   const [hoveredLot, setHoveredLot] = useState<Lot | null>(null);
+  const [selectedAmenity, setSelectedAmenity] = useState<Amenity | null>(null);
+  const [hoveredAmenity, setHoveredAmenity] = useState<Amenity | null>(null);
   const [filterLinea, setFilterLinea] = useState<LineaFilter>("all");
   const [filterPrice, setFilterPrice] = useState<PriceFilter>("all");
   const [debugCoord, setDebugCoord] = useState<{ x: number; y: number } | null>(null);
@@ -66,6 +71,8 @@ export default function LotMap() {
 
   const handleHoverStart = useCallback((lot: Lot) => setHoveredLot(lot), []);
   const handleHoverEnd = useCallback(() => setHoveredLot(null), []);
+  const handleAmenityHoverStart = useCallback((a: Amenity) => setHoveredAmenity(a), []);
+  const handleAmenityHoverEnd = useCallback(() => setHoveredAmenity(null), []);
 
   // Sync URL when selected lot changes
   useEffect(() => {
@@ -78,11 +85,18 @@ export default function LotMap() {
   }, [selectedLot, searchParams, router]);
 
   const handleSelect = (lot: Lot) => {
+    setSelectedAmenity(null);
     setSelectedLot((prev) => (prev?.id === lot.id ? null : lot));
+  };
+
+  const handleSelectAmenity = (amenity: Amenity) => {
+    setSelectedLot(null);
+    setSelectedAmenity((prev) => (prev?.id === amenity.id ? null : amenity));
   };
 
   const handleClose = () => {
     setSelectedLot(null);
+    setSelectedAmenity(null);
   };
 
   // ── Debug click handler — converts screen coords to SVG viewBox coords ──
@@ -210,6 +224,21 @@ export default function LotMap() {
             onClick={DEBUG_COORDS ? handleDebugClick : undefined}
             style={DEBUG_COORDS ? { cursor: "crosshair" } : undefined}
           >
+            {/* ── Lago label ──────────────────────────────── */}
+            <text
+              x={500}
+              y={345}
+              textAnchor="middle"
+              fill="white"
+              fontSize={18}
+              fontWeight="bold"
+              opacity={0.6}
+              letterSpacing={6}
+              className="pointer-events-none select-none"
+            >
+              LAGO COLBÚN
+            </text>
+
             {/* ── Line labels — LEFT margin (x=135, text x=127) ── */}
             {/* 1ª Línea (lots 35-40, y≈590) */}
             <line x1={135} y1={576} x2={135} y2={604} stroke="#2563EB" strokeWidth={3} />
@@ -269,6 +298,20 @@ export default function LotMap() {
               ))}
             </g>
 
+            {/* ── Amenity circles ─────────────────────────── */}
+            <g opacity={DEBUG_COORDS ? 0.3 : 1}>
+              {amenities.map((amenity) => (
+                <AmenityCircle
+                  key={amenity.id}
+                  amenity={amenity}
+                  isSelected={selectedAmenity?.id === amenity.id}
+                  onSelect={handleSelectAmenity}
+                  onHoverStart={handleAmenityHoverStart}
+                  onHoverEnd={handleAmenityHoverEnd}
+                />
+              ))}
+            </g>
+
             {/* ── Debug crosshair at last click ───────────── */}
             {DEBUG_COORDS && debugCoord && (
               <g pointerEvents="none">
@@ -303,9 +346,26 @@ export default function LotMap() {
             </div>
           )}
 
+          {/* ── Amenity hover tooltip ──────────────────────── */}
+          {hoveredAmenity && hoveredAmenity.id !== selectedAmenity?.id && (
+            <div
+              className="absolute pointer-events-none z-30 transition-opacity duration-100"
+              style={{
+                left: `${(hoveredAmenity.coords.cx / 850) * 100}%`,
+                top: `${(hoveredAmenity.coords.cy / 1100) * 100}%`,
+                transform: "translate(-50%, -120%)",
+              }}
+            >
+              <div className="bg-gray-900/90 text-white rounded-lg px-3 py-2 text-xs whitespace-nowrap shadow-lg backdrop-blur-sm">
+                <div className="font-bold text-sm">{hoveredAmenity.nombre}</div>
+              </div>
+              <div className="w-2 h-2 bg-gray-900/90 rotate-45 mx-auto -mt-1" />
+            </div>
+          )}
+
           {/* ── Debug coordinate overlay ──────────────────── */}
           {DEBUG_COORDS && (
-            <div className="absolute top-12 left-2 z-50 bg-black/80 text-white rounded-lg p-3 text-xs font-mono max-w-[260px] pointer-events-none">
+            <div className="fixed bottom-4 left-4 z-[9999] bg-black/90 text-white rounded-lg p-3 text-xs font-mono max-w-[260px]">
               <div className="text-yellow-300 font-bold mb-1">DEBUG: Click en el mapa para obtener coordenadas</div>
               {debugCoord && (
                 <div className="text-green-300 text-sm font-bold mb-2">
@@ -331,6 +391,8 @@ export default function LotMap() {
       <div className="lg:w-96 lg:flex-shrink-0 lg:overflow-y-auto">
         {selectedLot ? (
           <LotDetailPanel lot={selectedLot} onClose={handleClose} />
+        ) : selectedAmenity ? (
+          <AmenityDetailPanel amenity={selectedAmenity} onClose={handleClose} />
         ) : (
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
             {/* Header */}
@@ -399,7 +461,7 @@ export default function LotMap() {
 
     {/* ── Footer ── */}
     <footer className="text-gray-400 text-xs border-t border-gray-200 flex-shrink-0">
-      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-7 flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
         <span>© {new Date().getFullYear()} Mirador Alto Colbún · Lago Colbún, Región del Maule</span>
         <div className="flex items-center gap-4">
           <a href="https://wa.me/56966298663" target="_blank" rel="noopener noreferrer" className="hover:text-gray-600 transition-colors">+56 9 6629 8663</a>
