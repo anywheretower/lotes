@@ -1,6 +1,7 @@
 "use client";
 
-import { Amenity, AMENITY_COLOR } from "@/data/amenities";
+import type { Amenity } from "@/lib/types";
+import { AMENITY_COLOR } from "@/lib/constants";
 
 interface AmenityCircleProps {
   amenity: Amenity;
@@ -25,7 +26,6 @@ export default function AmenityCircle({ amenity, isSelected, onSelect, onHoverSt
       role="button"
       aria-label={amenity.nombre}
     >
-      {/* Selection ring */}
       {isSelected && (
         <circle
           cx={cx}
@@ -37,7 +37,6 @@ export default function AmenityCircle({ amenity, isSelected, onSelect, onHoverSt
         />
       )}
 
-      {/* Main circle */}
       <circle
         cx={cx}
         cy={cy}
@@ -49,7 +48,6 @@ export default function AmenityCircle({ amenity, isSelected, onSelect, onHoverSt
         className="transition-all duration-150 hover:fill-opacity-100"
       />
 
-      {/* Label */}
       <text
         x={cx}
         y={cy}

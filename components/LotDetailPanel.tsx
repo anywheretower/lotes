@@ -1,6 +1,8 @@
 "use client";
 
-import { Lot, statusColors } from "@/data/lots";
+import { useState } from "react";
+import type { Lot } from "@/lib/types";
+import { statusColors } from "@/lib/constants";
 
 interface LotDetailPanelProps {
   lot: Lot | null;
@@ -110,9 +112,9 @@ export default function LotDetailPanel({ lot, onClose }: LotDetailPanelProps) {
   if (!lot) return null;
 
   const statusColor = statusColors[lot.estado];
-  const isVendido = lot.estado === "Vendido";
   const showPrice = lot.estado === "Disponible";
   const showContactButton = lot.estado === "Disponible" || lot.estado === "Reservado";
+  const realPhotos = lot.fotos.filter((f) => f && !f.includes("placeholder"));
 
   return (
     <>
@@ -124,36 +126,39 @@ export default function LotDetailPanel({ lot, onClose }: LotDetailPanelProps) {
 
       {/* Panel */}
       <div className="fixed right-0 top-0 h-full w-full sm:w-96 bg-white z-50 lg:static lg:z-auto overflow-y-auto lg:border lg:border-neutral-100">
-        {/* Photo placeholder — flat tint with lot number */}
-        <div
-          className="relative h-44 w-full flex items-center justify-center"
-          style={{
-            background: `linear-gradient(135deg, ${statusColor}15 0%, ${statusColor}30 100%)`,
-          }}
-        >
-          <span
-            className="text-5xl font-black opacity-20 select-none"
-            style={{ color: statusColor }}
+        {/* Photo or placeholder */}
+        {realPhotos.length > 0 ? (
+          <PhotoCarousel photos={realPhotos} lotId={lot.id} statusColor={statusColor} onClose={onClose} />
+        ) : (
+          <div
+            className="relative h-44 w-full flex items-center justify-center"
+            style={{
+              background: `linear-gradient(135deg, ${statusColor}15 0%, ${statusColor}30 100%)`,
+            }}
           >
-            {lot.id}
-          </span>
-          <span
-            className="absolute bottom-3 left-4 text-xs font-medium px-2 py-0.5 bg-white/80"
-            style={{ color: statusColor }}
-          >
-            Sitio {lot.id}
-          </span>
-          {/* Close button */}
-          <button
-            onClick={onClose}
-            className="absolute top-3 right-3 p-1.5 bg-white/80 hover:bg-white transition-colors"
-            aria-label="Cerrar panel"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+            <span
+              className="text-5xl font-black opacity-20 select-none"
+              style={{ color: statusColor }}
+            >
+              {lot.id}
+            </span>
+            <span
+              className="absolute bottom-3 left-4 text-xs font-medium px-2 py-0.5 bg-white/80"
+              style={{ color: statusColor }}
+            >
+              Sitio {lot.id}
+            </span>
+            <button
+              onClick={onClose}
+              className="absolute top-3 right-3 p-1.5 bg-white/80 hover:bg-white transition-colors"
+              aria-label="Cerrar panel"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        )}
 
         <div className="p-5">
           {/* Status badge */}
@@ -197,7 +202,7 @@ export default function LotDetailPanel({ lot, onClose }: LotDetailPanelProps) {
             )}
           </div>
 
-          {/* Financing info — only for available/reserved */}
+          {/* Financing info */}
           {showContactButton && (
             <div className="mt-5 border border-neutral-100 p-4">
               <h3 className="text-[10px] font-medium uppercase tracking-wider text-neutral-400 mb-3">Financiamiento</h3>
@@ -245,6 +250,75 @@ export default function LotDetailPanel({ lot, onClose }: LotDetailPanelProps) {
     </>
   );
 }
+
+// ── Photo carousel ──────────────────────────────────────────────────
+
+function PhotoCarousel({ photos, lotId, statusColor, onClose }: {
+  photos: string[];
+  lotId: number;
+  statusColor: string;
+  onClose: () => void;
+}) {
+  const [idx, setIdx] = useState(0);
+  const current = photos[idx];
+
+  return (
+    <div className="relative h-44 w-full bg-neutral-100">
+      <img
+        src={current}
+        alt={`Sitio ${lotId} - foto ${idx + 1}`}
+        className="w-full h-full object-cover"
+      />
+      {photos.length > 1 && (
+        <>
+          <button
+            onClick={() => setIdx((i) => (i - 1 + photos.length) % photos.length)}
+            className="absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 text-white hover:bg-black/70 transition-colors"
+            aria-label="Foto anterior"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <button
+            onClick={() => setIdx((i) => (i + 1) % photos.length)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 text-white hover:bg-black/70 transition-colors"
+            aria-label="Foto siguiente"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+            {photos.map((_, i) => (
+              <span
+                key={i}
+                className={`w-1.5 h-1.5 rounded-full ${i === idx ? "bg-white" : "bg-white/50"}`}
+              />
+            ))}
+          </div>
+        </>
+      )}
+      <span
+        className="absolute bottom-3 left-4 text-xs font-medium px-2 py-0.5 bg-white/80"
+        style={{ color: statusColor }}
+      >
+        Sitio {lotId}
+      </span>
+      <button
+        onClick={onClose}
+        className="absolute top-3 right-3 p-1.5 bg-white/80 hover:bg-white transition-colors"
+        aria-label="Cerrar panel"
+      >
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
+// ── Detail row helpers ──────────────────────────────────────────────
 
 function DetailIconRow({
   icon,

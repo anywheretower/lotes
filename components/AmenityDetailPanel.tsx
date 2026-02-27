@@ -1,6 +1,7 @@
 "use client";
 
-import { Amenity, AMENITY_COLOR } from "@/data/amenities";
+import type { Amenity } from "@/lib/types";
+import { AMENITY_COLOR } from "@/lib/constants";
 
 interface AmenityDetailPanelProps {
   amenity: Amenity | null;
@@ -20,53 +21,64 @@ export default function AmenityDetailPanel({ amenity, onClose }: AmenityDetailPa
 
       {/* Panel */}
       <div className="fixed right-0 top-0 h-full w-full sm:w-96 bg-white z-50 lg:static lg:z-auto overflow-y-auto lg:border lg:border-neutral-100">
-        {/* Header with tint */}
-        <div
-          className="relative h-44 w-full flex items-center justify-center"
-          style={{
-            background: `linear-gradient(135deg, ${AMENITY_COLOR}15 0%, ${AMENITY_COLOR}30 100%)`,
-          }}
-        >
-          <span
-            className="text-5xl font-black opacity-20 select-none"
-            style={{ color: AMENITY_COLOR }}
+        {/* Header with tint or photo */}
+        {amenity.foto ? (
+          <div className="relative h-44 w-full bg-neutral-100">
+            <img
+              src={amenity.foto}
+              alt={amenity.nombre}
+              className="w-full h-full object-cover"
+            />
+            <span
+              className="absolute bottom-3 left-4 text-xs font-medium px-2 py-0.5 bg-white/80"
+              style={{ color: AMENITY_COLOR }}
+            >
+              Equipamiento
+            </span>
+            <button
+              onClick={onClose}
+              className="absolute top-3 right-3 p-1.5 bg-white/80 hover:bg-white transition-colors"
+              aria-label="Cerrar panel"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        ) : (
+          <div
+            className="relative h-44 w-full flex items-center justify-center"
+            style={{
+              background: `linear-gradient(135deg, ${AMENITY_COLOR}15 0%, ${AMENITY_COLOR}30 100%)`,
+            }}
           >
-            {amenity.inicial}
-          </span>
-          <span
-            className="absolute bottom-3 left-4 text-xs font-medium px-2 py-0.5 bg-white/80"
-            style={{ color: AMENITY_COLOR }}
-          >
-            Equipamiento
-          </span>
-          {/* Close button */}
-          <button
-            onClick={onClose}
-            className="absolute top-3 right-3 p-1.5 bg-white/80 hover:bg-white transition-colors"
-            aria-label="Cerrar panel"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+            <span
+              className="text-5xl font-black opacity-20 select-none"
+              style={{ color: AMENITY_COLOR }}
+            >
+              {amenity.inicial}
+            </span>
+            <span
+              className="absolute bottom-3 left-4 text-xs font-medium px-2 py-0.5 bg-white/80"
+              style={{ color: AMENITY_COLOR }}
+            >
+              Equipamiento
+            </span>
+            <button
+              onClick={onClose}
+              className="absolute top-3 right-3 p-1.5 bg-white/80 hover:bg-white transition-colors"
+              aria-label="Cerrar panel"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        )}
 
         <div className="p-5">
-          {/* Name */}
           <h2 className="text-lg font-semibold text-neutral-900 mb-4">{amenity.nombre}</h2>
 
-          {/* Photo */}
-          {amenity.foto && (
-            <div className="mb-4 overflow-hidden">
-              <img
-                src={amenity.foto}
-                alt={amenity.nombre}
-                className="w-full h-48 object-cover"
-              />
-            </div>
-          )}
-
-          {/* Notes */}
           {amenity.notas && (
             <div className="py-3 border-b border-neutral-100">
               <div className="flex items-center gap-3 mb-1.5">
@@ -84,7 +96,6 @@ export default function AmenityDetailPanel({ amenity, onClose }: AmenityDetailPa
             </div>
           )}
 
-          {/* No photo placeholder */}
           {!amenity.foto && !amenity.notas && (
             <p className="text-sm text-neutral-400 text-center py-6">
               Sin información adicional.

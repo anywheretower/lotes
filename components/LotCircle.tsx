@@ -1,6 +1,7 @@
 "use client";
 
-import { Lot, statusColors } from "@/data/lots";
+import type { Lot } from "@/lib/types";
+import { statusColors } from "@/lib/constants";
 
 interface LotCircleProps {
   lot: Lot;
@@ -28,7 +29,6 @@ export default function LotCircle({ lot, isSelected, dimmed, onSelect, onHoverSt
       opacity={dimmed ? 0.2 : 1}
       style={{ transition: "opacity 0.2s" }}
     >
-      {/* Selection ring */}
       {isSelected && (
         <circle
           cx={cx}
@@ -40,7 +40,6 @@ export default function LotCircle({ lot, isSelected, dimmed, onSelect, onHoverSt
         />
       )}
 
-      {/* Main circle */}
       <circle
         cx={cx}
         cy={cy}
@@ -52,7 +51,6 @@ export default function LotCircle({ lot, isSelected, dimmed, onSelect, onHoverSt
         className="transition-all duration-150 hover:fill-opacity-100"
       />
 
-      {/* Lot number */}
       <text
         x={cx}
         y={cy}

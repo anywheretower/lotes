@@ -1,8 +1,13 @@
 "use client";
 
-import { lots, statusColors, statusLabels, LotStatus } from "@/data/lots";
+import type { Lot, LotStatus } from "@/lib/types";
+import { statusColors, statusLabels } from "@/lib/constants";
 
-export default function Legend() {
+interface LegendProps {
+  lots: Lot[];
+}
+
+export default function Legend({ lots }: LegendProps) {
   const counts = lots.reduce(
     (acc, lot) => {
       acc[lot.estado] = (acc[lot.estado] || 0) + 1;

@@ -2,16 +2,13 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { lots, Lot, Linea, statusColors } from "@/data/lots";
-import { amenities, Amenity, AMENITY_COLOR } from "@/data/amenities";
+import type { Lot, Amenity, Linea } from "@/lib/types";
+import { statusColors } from "@/lib/constants";
 import LotCircle from "./LotCircle";
 import LotDetailPanel from "./LotDetailPanel";
 import AmenityCircle from "./AmenityCircle";
 import AmenityDetailPanel from "./AmenityDetailPanel";
 import Legend from "./Legend";
-
-// ── DEBUG MODE — set to false after calibration ──
-const DEBUG_COORDS = false;
 
 type LineaFilter = "all" | Linea | "otros";
 type PriceFilter = "all" | "low" | "mid" | "high";
@@ -32,7 +29,6 @@ const PRICE_OPTIONS: { value: PriceFilter; label: string }[] = [
 ];
 
 function matchesFilter(lot: Lot, linea: LineaFilter, price: PriceFilter): boolean {
-  // Line filter
   if (linea !== "all") {
     if (linea === "otros") {
       if (lot.linea !== null) return false;
@@ -40,7 +36,6 @@ function matchesFilter(lot: Lot, linea: LineaFilter, price: PriceFilter): boolea
       if (lot.linea !== linea) return false;
     }
   }
-  // Price filter (only applies to Disponible lots; non-disponible always pass)
   if (price !== "all" && lot.estado === "Disponible") {
     if (price === "low" && lot.precio > 2000) return false;
     if (price === "mid" && (lot.precio <= 2000 || lot.precio > 2300)) return false;
@@ -49,11 +44,15 @@ function matchesFilter(lot: Lot, linea: LineaFilter, price: PriceFilter): boolea
   return true;
 }
 
-export default function LotMap() {
+interface LotMapProps {
+  lots: Lot[];
+  amenities: Amenity[];
+}
+
+export default function LotMap({ lots, amenities }: LotMapProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // Read ?lote= from URL on mount
   const initialLotId = searchParams.get("lote");
   const initialLot = initialLotId
     ? lots.find((l) => l.id === Number(initialLotId)) ?? null
@@ -65,8 +64,6 @@ export default function LotMap() {
   const [hoveredAmenity, setHoveredAmenity] = useState<Amenity | null>(null);
   const [filterLinea, setFilterLinea] = useState<LineaFilter>("all");
   const [filterPrice, setFilterPrice] = useState<PriceFilter>("all");
-  const [debugCoord, setDebugCoord] = useState<{ x: number; y: number } | null>(null);
-  const [debugLog, setDebugLog] = useState<string[]>([]);
   const svgRef = useRef<SVGSVGElement>(null);
 
   const handleHoverStart = useCallback((lot: Lot) => setHoveredLot(lot), []);
@@ -74,7 +71,6 @@ export default function LotMap() {
   const handleAmenityHoverStart = useCallback((a: Amenity) => setHoveredAmenity(a), []);
   const handleAmenityHoverEnd = useCallback(() => setHoveredAmenity(null), []);
 
-  // Sync URL when selected lot changes
   useEffect(() => {
     const currentParam = searchParams.get("lote");
     const newParam = selectedLot ? String(selectedLot.id) : null;
@@ -99,23 +95,6 @@ export default function LotMap() {
     setSelectedAmenity(null);
   };
 
-  // ── Debug click handler — converts screen coords to SVG viewBox coords ──
-  const handleDebugClick = (e: React.MouseEvent<SVGSVGElement>) => {
-    if (!DEBUG_COORDS) return;
-    const svg = svgRef.current;
-    if (!svg) return;
-    const pt = svg.createSVGPoint();
-    pt.x = e.clientX;
-    pt.y = e.clientY;
-    const ctm = svg.getScreenCTM();
-    if (!ctm) return;
-    const svgPt = pt.matrixTransform(ctm.inverse());
-    const x = Math.round(svgPt.x);
-    const y = Math.round(svgPt.y);
-    setDebugCoord({ x, y });
-    setDebugLog((prev) => [`cx: ${x}, cy: ${y}`, ...prev].slice(0, 20));
-  };
-
   const hasActiveFilter = filterLinea !== "all" || filterPrice !== "all";
   const matchCount = hasActiveFilter ? lots.filter((l) => matchesFilter(l, filterLinea, filterPrice)).length : 0;
 
@@ -129,7 +108,7 @@ export default function LotMap() {
             <h1 className="text-lg sm:text-xl font-semibold tracking-tight text-neutral-900">
               Condominio Mirador Alto Colbún
             </h1>
-            <Legend />
+            <Legend lots={lots} />
           </div>
         </div>
 
@@ -156,7 +135,6 @@ export default function LotMap() {
               </div>
             </div>
 
-            {/* Separador */}
             <div className="hidden sm:block w-px h-5 bg-neutral-100" />
 
             {/* Precio */}
@@ -179,7 +157,6 @@ export default function LotMap() {
               </div>
             </div>
 
-            {/* Active filter indicator */}
             {hasActiveFilter && (
               <>
                 <div className="hidden sm:block w-px h-5 bg-neutral-100" />
@@ -207,7 +184,6 @@ export default function LotMap() {
         <div
           className="relative w-full aspect-[850/1100] -mt-[28%] -mb-[18%]"
         >
-          {/* Background image */}
           <img
             src="/plano-base.png"
             alt="Plano Mirador Alto Colbún"
@@ -215,16 +191,12 @@ export default function LotMap() {
             draggable={false}
           />
 
-          {/* SVG overlay */}
           <svg
             ref={svgRef}
             viewBox="0 0 850 1100"
             className="absolute inset-0 w-full h-full"
             preserveAspectRatio="xMidYMid meet"
-            onClick={DEBUG_COORDS ? handleDebugClick : undefined}
-            style={DEBUG_COORDS ? { cursor: "crosshair" } : undefined}
           >
-            {/* ── Lago label ──────────────────────────────── */}
             <text
               x={500}
               y={345}
@@ -239,52 +211,46 @@ export default function LotMap() {
               LAGO COLBÚN
             </text>
 
-            {/* ── Line labels — LEFT margin (x=135, text x=127) ── */}
-            {/* 1ª Línea (lots 35-40, y≈590) */}
+            {/* ── Line labels — LEFT margin ── */}
             <line x1={135} y1={576} x2={135} y2={604} stroke="#2563EB" strokeWidth={3} />
             <text x={127} y={590} textAnchor="middle" fill="#2563EB" fontSize={8} fontWeight="bold"
               transform="rotate(-90, 127, 590)">
               1ª LINEA
             </text>
 
-            {/* 2ª Línea (lots 29-34, y≈629-633) */}
             <line x1={135} y1={615} x2={135} y2={647} stroke="#2563EB" strokeWidth={3} />
             <text x={127} y={631} textAnchor="middle" fill="#2563EB" fontSize={8} fontWeight="bold"
               transform="rotate(-90, 127, 631)">
               2ª LINEA
             </text>
 
-            {/* 3ª Línea (lots 22-28, y≈666-700) */}
             <line x1={135} y1={652} x2={135} y2={714} stroke="#65A30D" strokeWidth={3} />
             <text x={127} y={683} textAnchor="middle" fill="#65A30D" fontSize={8} fontWeight="bold"
               transform="rotate(-90, 127, 683)">
               3ª LINEA
             </text>
 
-            {/* ── Line labels — RIGHT margin (x=716, text x=726) ── */}
-            {/* 1ª Línea (lots 71-76, y≈516-535) */}
+            {/* ── Line labels — RIGHT margin ── */}
             <line x1={716} y1={502} x2={716} y2={549} stroke="#2563EB" strokeWidth={3} />
             <text x={726} y={526} textAnchor="middle" fill="#2563EB" fontSize={8} fontWeight="bold"
               transform="rotate(90, 726, 526)">
               1ª LINEA
             </text>
 
-            {/* 2ª Línea (lots 65-70, y≈588-596) */}
             <line x1={716} y1={574} x2={716} y2={610} stroke="#2563EB" strokeWidth={3} />
             <text x={726} y={592} textAnchor="middle" fill="#2563EB" fontSize={8} fontWeight="bold"
               transform="rotate(90, 726, 592)">
               2ª LINEA
             </text>
 
-            {/* 3ª Línea (lots 59-64, y≈637-642) */}
             <line x1={716} y1={623} x2={716} y2={656} stroke="#65A30D" strokeWidth={3} />
             <text x={726} y={640} textAnchor="middle" fill="#65A30D" fontSize={8} fontWeight="bold"
               transform="rotate(90, 726, 640)">
               3ª LINEA
             </text>
 
-            {/* ── Lot circles ──────────────────────────────── */}
-            <g opacity={DEBUG_COORDS ? 0.3 : 1}>
+            {/* ── Lot circles ── */}
+            <g>
               {lots.map((lot) => (
                 <LotCircle
                   key={lot.id}
@@ -298,8 +264,8 @@ export default function LotMap() {
               ))}
             </g>
 
-            {/* ── Amenity circles ─────────────────────────── */}
-            <g opacity={DEBUG_COORDS ? 0.3 : 1}>
+            {/* ── Amenity circles ── */}
+            <g>
               {amenities.map((amenity) => (
                 <AmenityCircle
                   key={amenity.id}
@@ -311,18 +277,9 @@ export default function LotMap() {
                 />
               ))}
             </g>
-
-            {/* ── Debug crosshair at last click ───────────── */}
-            {DEBUG_COORDS && debugCoord && (
-              <g pointerEvents="none">
-                <line x1={debugCoord.x - 12} y1={debugCoord.y} x2={debugCoord.x + 12} y2={debugCoord.y} stroke="red" strokeWidth={2} />
-                <line x1={debugCoord.x} y1={debugCoord.y - 12} x2={debugCoord.x} y2={debugCoord.y + 12} stroke="red" strokeWidth={2} />
-                <circle cx={debugCoord.x} cy={debugCoord.y} r={3} fill="red" />
-              </g>
-            )}
           </svg>
 
-          {/* ── Hover tooltip ──────────────────────────────── */}
+          {/* ── Hover tooltip ── */}
           {hoveredLot && hoveredLot.id !== selectedLot?.id && (
             <div
               className="absolute pointer-events-none z-30 transition-opacity duration-100"
@@ -346,7 +303,7 @@ export default function LotMap() {
             </div>
           )}
 
-          {/* ── Amenity hover tooltip ──────────────────────── */}
+          {/* ── Amenity hover tooltip ── */}
           {hoveredAmenity && hoveredAmenity.id !== selectedAmenity?.id && (
             <div
               className="absolute pointer-events-none z-30 transition-opacity duration-100"
@@ -362,27 +319,6 @@ export default function LotMap() {
               <div className="w-2 h-2 bg-gray-900/90 rotate-45 mx-auto -mt-1" />
             </div>
           )}
-
-          {/* ── Debug coordinate overlay ──────────────────── */}
-          {DEBUG_COORDS && (
-            <div className="fixed bottom-4 left-4 z-[9999] bg-black/90 text-white rounded-lg p-3 text-xs font-mono max-w-[260px]">
-              <div className="text-yellow-300 font-bold mb-1">DEBUG: Click en el mapa para obtener coordenadas</div>
-              {debugCoord && (
-                <div className="text-green-300 text-sm font-bold mb-2">
-                  cx: {debugCoord.x}, cy: {debugCoord.y}
-                </div>
-              )}
-              {debugLog.length > 0 && (
-                <div className="border-t border-white/20 pt-1 mt-1 space-y-0.5">
-                  {debugLog.map((entry, i) => (
-                    <div key={i} className={i === 0 ? "text-green-300" : "text-gray-400"}>
-                      {entry}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
         </div>
         </div>
       </div>
@@ -395,7 +331,6 @@ export default function LotMap() {
           <AmenityDetailPanel amenity={selectedAmenity} onClose={handleClose} />
         ) : (
           <div className="border border-neutral-100 overflow-hidden">
-            {/* Header */}
             <div className="bg-neutral-900 px-5 py-6 text-white">
               <h2 className="text-sm font-semibold tracking-tight">
                 Bienvenido a Mirador Alto Colbún
@@ -404,7 +339,6 @@ export default function LotMap() {
             </div>
 
             <div className="p-5 space-y-5">
-              {/* Steps */}
               <div className="space-y-4">
                 <WelcomeStep number={1} title="Explora el plano" description="Pasa el cursor sobre los círculos numerados para ver un resumen rápido de cada sitio." />
                 <WelcomeStep number={2} title="Selecciona un sitio" description="Haz clic en cualquier sitio para ver su ficha completa con superficie, precio, ubicación y más." />
@@ -412,7 +346,6 @@ export default function LotMap() {
                 <WelcomeStep number={4} title="Consulta por WhatsApp" description="¿Te interesa un sitio? Desde su ficha puedes contactarnos directamente." />
               </div>
 
-              {/* Color legend */}
               <div className="border border-neutral-100 p-4">
                 <h3 className="text-[10px] font-medium uppercase tracking-wider text-neutral-400 mb-3">Colores del plano</h3>
                 <div className="grid grid-cols-2 gap-2">
@@ -430,7 +363,6 @@ export default function LotMap() {
                 </div>
               </div>
 
-              {/* Tip */}
               <p className="text-xs text-neutral-400 text-center">
                 Haz clic en un sitio del plano para comenzar
               </p>
