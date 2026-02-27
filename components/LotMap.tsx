@@ -28,7 +28,8 @@ const PRICE_OPTIONS: { value: PriceFilter; label: string }[] = [
   { value: "high", label: "> 2.300 UF" },
 ];
 
-function matchesFilter(lot: Lot, linea: LineaFilter, price: PriceFilter): boolean {
+function matchesFilter(lot: Lot, linea: LineaFilter, price: PriceFilter, soloDisponible: boolean): boolean {
+  if (soloDisponible && lot.estado !== "Disponible") return false;
   if (linea !== "all") {
     if (linea === "otros") {
       if (lot.linea !== null) return false;
@@ -64,6 +65,7 @@ export default function LotMap({ lots, amenities }: LotMapProps) {
   const [hoveredAmenity, setHoveredAmenity] = useState<Amenity | null>(null);
   const [filterLinea, setFilterLinea] = useState<LineaFilter>("all");
   const [filterPrice, setFilterPrice] = useState<PriceFilter>("all");
+  const [filterDisponible, setFilterDisponible] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
 
   const handleHoverStart = useCallback((lot: Lot) => setHoveredLot(lot), []);
@@ -95,8 +97,8 @@ export default function LotMap({ lots, amenities }: LotMapProps) {
     setSelectedAmenity(null);
   };
 
-  const hasActiveFilter = filterLinea !== "all" || filterPrice !== "all";
-  const matchCount = hasActiveFilter ? lots.filter((l) => matchesFilter(l, filterLinea, filterPrice)).length : 0;
+  const hasActiveFilter = filterLinea !== "all" || filterPrice !== "all" || filterDisponible;
+  const matchCount = hasActiveFilter ? lots.filter((l) => matchesFilter(l, filterLinea, filterPrice, filterDisponible)).length : 0;
 
   return (
     <div className="lg:h-full lg:flex lg:flex-col lg:overflow-hidden">
@@ -157,6 +159,20 @@ export default function LotMap({ lots, amenities }: LotMapProps) {
               </div>
             </div>
 
+            <div className="hidden sm:block w-px h-5 bg-neutral-100" />
+
+            {/* Solo disponibles */}
+            <button
+              onClick={() => setFilterDisponible(!filterDisponible)}
+              className={`px-3 py-1 text-[11px] font-medium text-center transition-colors ${
+                filterDisponible
+                  ? "bg-green-600 text-white"
+                  : "text-neutral-500 hover:text-neutral-900 border border-neutral-200 hover:border-neutral-900"
+              }`}
+            >
+              Solo disponibles
+            </button>
+
             {hasActiveFilter && (
               <>
                 <div className="hidden sm:block w-px h-5 bg-neutral-100" />
@@ -165,7 +181,7 @@ export default function LotMap({ lots, amenities }: LotMapProps) {
                     {matchCount} sitio{matchCount !== 1 ? "s" : ""} coinciden
                   </span>
                   <button
-                    onClick={() => { setFilterLinea("all"); setFilterPrice("all"); }}
+                    onClick={() => { setFilterLinea("all"); setFilterPrice("all"); setFilterDisponible(false); }}
                     className="text-[11px] text-red-500 hover:text-red-600 font-medium transition-colors"
                   >
                     Limpiar
@@ -256,7 +272,7 @@ export default function LotMap({ lots, amenities }: LotMapProps) {
                   key={lot.id}
                   lot={lot}
                   isSelected={selectedLot?.id === lot.id}
-                  dimmed={hasActiveFilter && !matchesFilter(lot, filterLinea, filterPrice)}
+                  dimmed={hasActiveFilter && !matchesFilter(lot, filterLinea, filterPrice, filterDisponible)}
                   onSelect={handleSelect}
                   onHoverStart={handleHoverStart}
                   onHoverEnd={handleHoverEnd}
