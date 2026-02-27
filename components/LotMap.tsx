@@ -127,7 +127,7 @@ export default function LotMap() {
         <div className="px-4 sm:px-6 lg:px-8 py-4 border-b border-neutral-100">
           <div className="max-w-screen-2xl mx-auto flex items-center justify-between">
             <h1 className="text-lg sm:text-xl font-semibold tracking-tight text-neutral-900">
-              Mirador Alto Colbún
+              Condominio Mirador Alto Colbún
             </h1>
             <Legend />
           </div>
