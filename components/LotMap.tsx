@@ -122,32 +122,39 @@ export default function LotMap() {
   return (
     <div className="lg:h-full lg:flex lg:flex-col lg:overflow-hidden">
       {/* ── Header ── */}
-      <header className="sticky top-0 z-30 bg-white border-b border-gray-200 flex-shrink-0">
+      <header className="sticky top-0 z-30 flex-shrink-0 bg-white/95 backdrop-blur-md shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
         {/* Row 1: Title + Legend */}
-        <div className="px-4 sm:px-6 lg:px-8 py-5 border-b border-gray-100">
+        <div className="px-4 sm:px-6 lg:px-8 py-4 border-b border-[var(--color-border)]">
           <div className="max-w-screen-2xl mx-auto flex items-center justify-between">
-            <h1 className="text-lg sm:text-xl font-bold text-gray-900">
-              Mirador Alto Colbún
-            </h1>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#3771b3] to-[#1e3a5f] flex items-center justify-center shadow-sm">
+                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-primary-dark)' }}>
+                Mirador Alto Colbún
+              </h1>
+            </div>
             <Legend />
           </div>
         </div>
 
         {/* Row 2: Filters */}
-        <div className="px-4 sm:px-6 lg:px-8 py-4 bg-gray-50">
+        <div className="px-4 sm:px-6 lg:px-8 py-3">
           <div className="max-w-screen-2xl mx-auto flex flex-wrap items-center gap-x-6 gap-y-2">
             {/* Ubicación */}
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Ubicación</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Ubicación</span>
               <div className="flex gap-1">
                 {LINEA_OPTIONS.map((opt) => (
                   <button
                     key={opt.value}
                     onClick={() => setFilterLinea(filterLinea === opt.value ? "all" : opt.value)}
-                    className={`px-3 py-1 rounded-full text-[11px] font-medium text-center transition-colors ${
+                    className={`px-3 py-1.5 rounded-full text-[11px] font-medium text-center transition-all duration-200 ${
                       filterLinea === opt.value
-                        ? "bg-[#3771b3] text-white"
-                        : "bg-white text-gray-500 hover:bg-gray-100 border border-gray-200"
+                        ? "bg-[var(--color-primary-dark)] text-white shadow-sm"
+                        : "bg-white text-[var(--color-text-muted)] hover:bg-white hover:shadow-sm border border-[var(--color-border)]"
                     }`}
                   >
                     {opt.label}
@@ -157,20 +164,20 @@ export default function LotMap() {
             </div>
 
             {/* Separador */}
-            <div className="hidden sm:block w-px h-5 bg-gray-200" />
+            <div className="hidden sm:block w-px h-5" style={{ backgroundColor: 'var(--color-border)' }} />
 
             {/* Precio */}
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Precio</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Precio</span>
               <div className="flex gap-1">
                 {PRICE_OPTIONS.map((opt) => (
                   <button
                     key={opt.value}
                     onClick={() => setFilterPrice(filterPrice === opt.value ? "all" : opt.value)}
-                    className={`px-3 py-1 rounded-full text-[11px] font-medium text-center transition-colors ${
+                    className={`px-3 py-1.5 rounded-full text-[11px] font-medium text-center transition-all duration-200 ${
                       filterPrice === opt.value
-                        ? "bg-[#3771b3] text-white"
-                        : "bg-white text-gray-500 hover:bg-gray-100 border border-gray-200"
+                        ? "bg-[var(--color-primary-dark)] text-white shadow-sm"
+                        : "bg-white text-[var(--color-text-muted)] hover:bg-white hover:shadow-sm border border-[var(--color-border)]"
                     }`}
                   >
                     {opt.label}
@@ -182,14 +189,14 @@ export default function LotMap() {
             {/* Active filter indicator */}
             {hasActiveFilter && (
               <>
-                <div className="hidden sm:block w-px h-5 bg-gray-200" />
+                <div className="hidden sm:block w-px h-5" style={{ backgroundColor: 'var(--color-border)' }} />
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] text-gray-500">
+                  <span className="text-[11px] font-medium" style={{ color: 'var(--color-text-muted)' }}>
                     {matchCount} sitio{matchCount !== 1 ? "s" : ""} coinciden
                   </span>
                   <button
                     onClick={() => { setFilterLinea("all"); setFilterPrice("all"); }}
-                    className="text-[11px] text-red-600 hover:text-red-700 font-medium"
+                    className="text-[11px] text-red-500 hover:text-red-600 font-semibold transition-colors"
                   >
                     Limpiar
                   </button>
@@ -332,17 +339,17 @@ export default function LotMap() {
                 transform: "translate(-50%, -120%)",
               }}
             >
-              <div className="bg-gray-900/90 text-white rounded-lg px-3 py-2 text-xs whitespace-nowrap shadow-lg backdrop-blur-sm">
+              <div className="bg-[var(--color-primary-dark)]/95 text-white rounded-xl px-3.5 py-2.5 text-xs whitespace-nowrap shadow-xl backdrop-blur-md border border-white/10">
                 <div className="font-bold text-sm mb-0.5">Sitio {hoveredLot.id}</div>
-                <div className="text-gray-300">{hoveredLot.superficie.toLocaleString("es-CL")} m² · {hoveredLot.linea ?? "Otros"}</div>
+                <div className="text-white/60">{hoveredLot.superficie.toLocaleString("es-CL")} m² · {hoveredLot.linea ?? "Otros"}</div>
                 {hoveredLot.estado === "Disponible" && (
-                  <div className="text-green-400 font-semibold">{hoveredLot.precio.toLocaleString("es-CL")} UF</div>
+                  <div className="text-green-300 font-semibold">{hoveredLot.precio.toLocaleString("es-CL")} UF</div>
                 )}
                 {hoveredLot.estado !== "Disponible" && (
                   <div style={{ color: statusColors[hoveredLot.estado] }} className="font-semibold">{hoveredLot.estado}</div>
                 )}
               </div>
-              <div className="w-2 h-2 bg-gray-900/90 rotate-45 mx-auto -mt-1" />
+              <div className="w-2 h-2 bg-[var(--color-primary-dark)]/95 rotate-45 mx-auto -mt-1" />
             </div>
           )}
 
@@ -394,64 +401,46 @@ export default function LotMap() {
         ) : selectedAmenity ? (
           <AmenityDetailPanel amenity={selectedAmenity} onClose={handleClose} />
         ) : (
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden animate-fade-in-up border border-[var(--color-border)]">
             {/* Header */}
-            <div className="bg-gradient-to-br from-[#3771b3] to-[#2a5a8f] px-5 py-6 text-white">
-              <h2 className="text-lg font-bold">Bienvenido a Mirador Alto Colbún</h2>
-              <p className="text-sm text-white/80 mt-1">Explora los sitios disponibles en el plano interactivo</p>
+            <div className="relative px-6 py-8 text-white overflow-hidden" style={{ background: 'linear-gradient(135deg, #1e3a5f 0%, #3771b3 60%, #4a90d9 100%)' }}>
+              <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 70% 20%, white 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
+              <h2 className="text-2xl font-bold relative" style={{ fontFamily: 'var(--font-display)' }}>
+                Bienvenido a<br />Mirador Alto Colbún
+              </h2>
+              <p className="text-sm text-white/70 mt-2 relative font-light">Explora los sitios disponibles en el plano interactivo</p>
             </div>
 
-            <div className="p-5 space-y-5">
+            <div className="p-6 space-y-6">
               {/* Steps */}
               <div className="space-y-4">
-                <WelcomeStep
-                  number={1}
-                  title="Explora el plano"
-                  description="Pasa el cursor sobre los círculos numerados para ver un resumen rápido de cada sitio."
-                />
-                <WelcomeStep
-                  number={2}
-                  title="Selecciona un sitio"
-                  description="Haz clic en cualquier sitio para ver su ficha completa con superficie, precio, ubicación y más."
-                />
-                <WelcomeStep
-                  number={3}
-                  title="Filtra por ubicación o precio"
-                  description="Usa los filtros de arriba del plano para encontrar sitios según tu preferencia. Los que no coincidan se atenúan."
-                />
-                <WelcomeStep
-                  number={4}
-                  title="Consulta por WhatsApp"
-                  description="¿Te interesa un sitio? Desde su ficha puedes contactarnos directamente por WhatsApp."
-                />
+                <WelcomeStep number={1} title="Explora el plano" description="Pasa el cursor sobre los círculos numerados para ver un resumen rápido de cada sitio." />
+                <WelcomeStep number={2} title="Selecciona un sitio" description="Haz clic en cualquier sitio para ver su ficha completa con superficie, precio, ubicación y más." />
+                <WelcomeStep number={3} title="Filtra por ubicación o precio" description="Usa los filtros de arriba del plano para encontrar sitios según tu preferencia." />
+                <WelcomeStep number={4} title="Consulta por WhatsApp" description="¿Te interesa un sitio? Desde su ficha puedes contactarnos directamente." />
               </div>
 
               {/* Color legend */}
-              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
-                <h3 className="text-xs font-bold text-gray-700 uppercase tracking-wide mb-3">Colores del plano</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full bg-[#3771b3]" />
-                    <span className="text-xs text-gray-600">Vendido</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full bg-[#16A34A]" />
-                    <span className="text-xs text-gray-600">Disponible</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full bg-[#C62828]" />
-                    <span className="text-xs text-gray-600">Promesado</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full bg-[#E65100]" />
-                    <span className="text-xs text-gray-600">Reservado</span>
-                  </div>
+              <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] p-4">
+                <h3 className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--color-text-muted)' }}>Colores del plano</h3>
+                <div className="grid grid-cols-2 gap-2.5">
+                  {[
+                    { color: "#16A34A", label: "Disponible" },
+                    { color: "#3771b3", label: "Vendido" },
+                    { color: "#C62828", label: "Promesado" },
+                    { color: "#E65100", label: "Reservado" },
+                  ].map((item) => (
+                    <div key={item.label} className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full ring-2 ring-white shadow-sm" style={{ backgroundColor: item.color }} />
+                      <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{item.label}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
               {/* Tip */}
-              <p className="text-xs text-gray-400 text-center">
-                Haz clic en un sitio del plano para comenzar →
+              <p className="text-xs text-center font-medium" style={{ color: '#94a3b8' }}>
+                Selecciona un sitio en el plano para comenzar
               </p>
             </div>
           </div>
@@ -460,15 +449,20 @@ export default function LotMap() {
     </div>
 
     {/* ── Footer ── */}
-    <footer className="text-gray-400 text-xs border-t border-gray-200 flex-shrink-0">
-      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-7 flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
-        <span>© {new Date().getFullYear()} Mirador Alto Colbún · Lago Colbún, Región del Maule</span>
+    <footer className="flex-shrink-0 border-t border-[var(--color-border)]" style={{ backgroundColor: 'rgba(255,255,255,0.6)' }}>
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
+        <span className="text-xs font-light" style={{ color: 'var(--color-text-muted)' }}>
+          © {new Date().getFullYear()} Mirador Alto Colbún · Lago Colbún, Región del Maule
+        </span>
         <div className="flex items-center gap-4">
-          <a href="https://wa.me/56966298663" target="_blank" rel="noopener noreferrer" className="hover:text-gray-600 transition-colors">+56 9 6629 8663</a>
-          <a href="https://www.instagram.com/miradoraltocolbun" target="_blank" rel="noopener noreferrer" className="hover:text-gray-600 transition-colors" aria-label="Instagram">
+          <a href="https://wa.me/56966298663" target="_blank" rel="noopener noreferrer" className="text-xs font-medium transition-colors" style={{ color: 'var(--color-text-muted)' }}>
+            +56 9 6629 8663
+          </a>
+          <div className="w-px h-3.5" style={{ backgroundColor: 'var(--color-border)' }} />
+          <a href="https://www.instagram.com/miradoraltocolbun" target="_blank" rel="noopener noreferrer" className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }} aria-label="Instagram">
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
           </a>
-          <a href="https://miradoraltocolbun.cl" target="_blank" rel="noopener noreferrer" className="hover:text-gray-600 transition-colors" aria-label="Sitio web">
+          <a href="https://miradoraltocolbun.cl" target="_blank" rel="noopener noreferrer" className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }} aria-label="Sitio web">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
           </a>
         </div>
@@ -480,13 +474,13 @@ export default function LotMap() {
 
 function WelcomeStep({ number, title, description }: { number: number; title: string; description: string }) {
   return (
-    <div className="flex gap-3">
-      <span className="flex-shrink-0 w-7 h-7 rounded-full bg-[#3771b3] text-white text-xs font-bold flex items-center justify-center mt-0.5">
+    <div className={`flex gap-3 opacity-0 animate-fade-in-up stagger-${number}`}>
+      <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-[var(--color-primary-dark)] text-white text-xs font-bold flex items-center justify-center mt-0.5">
         {number}
       </span>
       <div>
-        <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
-        <p className="text-xs text-gray-500 leading-relaxed mt-0.5">{description}</p>
+        <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>{title}</h3>
+        <p className="text-xs leading-relaxed mt-0.5" style={{ color: 'var(--color-text-muted)' }}>{description}</p>
       </div>
     </div>
   );

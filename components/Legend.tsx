@@ -17,20 +17,20 @@ export default function Legend() {
 
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <span className="text-xs font-medium text-gray-500">
+      <span className="text-xs font-semibold" style={{ color: 'var(--color-primary)' }}>
         {disponibles}/{total} disponibles
       </span>
-      <span className="hidden sm:block w-px h-4 bg-gray-200" />
+      <span className="hidden sm:block w-px h-4" style={{ backgroundColor: 'var(--color-border)' }} />
       {statuses.map((status) => {
         const count = counts[status] || 0;
         if (count === 0) return null;
         return (
           <div key={status} className="flex items-center gap-1.5">
             <div
-              className="w-2.5 h-2.5 rounded-full"
+              className="w-2 h-2 rounded-full ring-1 ring-white shadow-sm"
               style={{ backgroundColor: statusColors[status] }}
             />
-            <span className="text-xs text-gray-500">
+            <span className="text-[11px]" style={{ color: 'var(--color-text-muted)' }}>
               {statusLabels[status]} ({count})
             </span>
           </div>
