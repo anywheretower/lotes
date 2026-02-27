@@ -123,35 +123,33 @@ export default function LotDetailPanel({ lot, onClose }: LotDetailPanelProps) {
       />
 
       {/* Panel */}
-      <div className="fixed right-0 top-0 h-full w-full sm:w-96 bg-white shadow-2xl z-50 lg:static lg:z-auto lg:shadow-lg overflow-y-auto lg:rounded-2xl lg:border lg:border-[var(--color-border)]">
-        {/* Photo placeholder — gradient with lot number */}
+      <div className="fixed right-0 top-0 h-full w-full sm:w-96 bg-white z-50 lg:static lg:z-auto overflow-y-auto lg:border lg:border-neutral-100">
+        {/* Photo placeholder — flat tint with lot number */}
         <div
-          className="relative h-48 w-full flex items-center justify-center overflow-hidden lg:rounded-t-2xl"
+          className="relative h-44 w-full flex items-center justify-center"
           style={{
-            background: `linear-gradient(135deg, ${statusColor}18 0%, ${statusColor}35 50%, ${statusColor}55 100%)`,
+            background: `linear-gradient(135deg, ${statusColor}15 0%, ${statusColor}30 100%)`,
           }}
         >
-          {/* Decorative pattern */}
-          <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: `radial-gradient(${statusColor} 1px, transparent 1px)`, backgroundSize: '16px 16px' }} />
           <span
-            className="text-7xl select-none"
-            style={{ color: statusColor, opacity: 0.15, fontFamily: 'var(--font-display)', fontWeight: 700 }}
+            className="text-6xl font-black opacity-20 select-none"
+            style={{ color: statusColor }}
           >
             {lot.id}
           </span>
           <span
-            className="absolute bottom-3 left-4 text-xs font-semibold px-3 py-1 rounded-lg bg-white/90 backdrop-blur-sm shadow-sm"
+            className="absolute bottom-3 left-4 text-xs font-medium px-2 py-0.5 bg-white/80"
             style={{ color: statusColor }}
           >
             Sitio {lot.id}
           </span>
-          {/* Close button over photo */}
+          {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-3 right-3 p-2 bg-white/90 hover:bg-white rounded-xl transition-all shadow-sm hover:shadow"
+            className="absolute top-3 right-3 p-1.5 bg-white/80 hover:bg-white transition-colors"
             aria-label="Cerrar panel"
           >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -161,7 +159,7 @@ export default function LotDetailPanel({ lot, onClose }: LotDetailPanelProps) {
           {/* Status badge */}
           <div className="mb-5">
             <span
-              className="inline-block px-4 py-1.5 rounded-lg text-white text-sm font-semibold shadow-sm"
+              className="inline-block px-3 py-1 text-white text-xs font-medium"
               style={{ backgroundColor: statusColor }}
             >
               {lot.estado}
@@ -201,53 +199,41 @@ export default function LotDetailPanel({ lot, onClose }: LotDetailPanelProps) {
 
           {/* Financing info — only for available/reserved */}
           {showContactButton && (
-            <div className="mt-5 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] p-4">
-              <h3 className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--color-text-muted)' }}>Financiamiento</h3>
-              <div className="space-y-2.5 text-sm">
+            <div className="mt-5 border border-neutral-100 p-4">
+              <h3 className="text-[10px] font-medium uppercase tracking-wider text-neutral-400 mb-3">Financiamiento</h3>
+              <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span style={{ color: 'var(--color-text-muted)' }}>Reserva</span>
-                  <span className="font-semibold" style={{ color: 'var(--color-text)' }}>$1.000.000 CLP</span>
+                  <span className="text-neutral-600">Reserva</span>
+                  <span className="font-semibold text-neutral-900">$1.000.000 CLP</span>
                 </div>
                 <div className="flex justify-between">
-                  <span style={{ color: 'var(--color-text-muted)' }}>Financiamiento propio</span>
-                  <span className="font-semibold" style={{ color: 'var(--color-text)' }}>Hasta 36 cuotas</span>
+                  <span className="text-neutral-600">Financiamiento propio</span>
+                  <span className="font-semibold text-neutral-900">Hasta 36 cuotas</span>
                 </div>
               </div>
 
-              <div className="h-px my-4" style={{ backgroundColor: 'var(--color-border)' }} />
+              <div className="h-px bg-neutral-100 my-4" />
 
-              <h3 className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--color-text-muted)' }}>Proceso de compra</h3>
-              <ol className="space-y-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                <li className="flex gap-2">
-                  <span className="flex-shrink-0 w-5 h-5 rounded bg-[var(--color-primary-dark)] text-white text-[10px] font-bold flex items-center justify-center">1</span>
-                  <span><span className="font-semibold" style={{ color: 'var(--color-text)' }}>Reserva:</span> $1.000.000 formaliza tu intención</span>
-                </li>
-                <li className="flex gap-2">
-                  <span className="flex-shrink-0 w-5 h-5 rounded bg-[var(--color-primary-dark)] text-white text-[10px] font-bold flex items-center justify-center">2</span>
-                  <span><span className="font-semibold" style={{ color: 'var(--color-text)' }}>Promesa:</span> Firma y pago del 30% (~15 días)</span>
-                </li>
-                <li className="flex gap-2">
-                  <span className="flex-shrink-0 w-5 h-5 rounded bg-[var(--color-primary-dark)] text-white text-[10px] font-bold flex items-center justify-center">3</span>
-                  <span><span className="font-semibold" style={{ color: 'var(--color-text)' }}>Escrituración:</span> Firma en notaría</span>
-                </li>
-                <li className="flex gap-2">
-                  <span className="flex-shrink-0 w-5 h-5 rounded bg-[var(--color-primary-dark)] text-white text-[10px] font-bold flex items-center justify-center">4</span>
-                  <span><span className="font-semibold" style={{ color: 'var(--color-text)' }}>Entrega:</span> Acceso al condominio</span>
-                </li>
+              <h3 className="text-[10px] font-medium uppercase tracking-wider text-neutral-400 mb-2">Proceso de compra</h3>
+              <ol className="space-y-1.5 text-xs text-neutral-600">
+                <li><span className="font-semibold text-neutral-900">1. Reserva:</span> $1.000.000 formaliza tu intención</li>
+                <li><span className="font-semibold text-neutral-900">2. Promesa:</span> Firma y pago del 30% (~15 días)</li>
+                <li><span className="font-semibold text-neutral-900">3. Escrituración:</span> Firma en notaría</li>
+                <li><span className="font-semibold text-neutral-900">4. Entrega:</span> Acceso al condominio</li>
               </ol>
             </div>
           )}
 
           {/* Contact button */}
           {showContactButton && (
-            <div className="mt-5">
+            <div className="mt-4">
               <a
                 href={`https://wa.me/56966298663?text=${encodeURIComponent(`Hola, me interesa el Sitio ${lot.id} de Mirador Alto Colbún (${lot.superficie} m², ${lot.linea ?? "Otros"})`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2.5 w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-semibold py-3.5 px-6 rounded-xl transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5"
+                className="flex items-center justify-center gap-2 w-full bg-neutral-900 hover:bg-neutral-800 text-white font-medium py-3 px-6 text-sm transition-colors"
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z" />
                 </svg>
                 Me interesa este sitio
@@ -272,13 +258,10 @@ function DetailIconRow({
   highlight?: boolean;
 }) {
   return (
-    <div className="flex items-center gap-3 py-3 border-b" style={{ borderColor: 'var(--color-border)' }}>
-      <span className="flex-shrink-0" style={{ color: 'var(--color-text-muted)' }}>{icon}</span>
-      <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{label}</span>
-      <span
-        className="ml-auto text-right font-semibold text-sm"
-        style={{ color: highlight ? 'var(--color-primary)' : 'var(--color-text)' }}
-      >
+    <div className="flex items-center gap-3 py-3 border-b border-neutral-100">
+      <span className="text-neutral-400 flex-shrink-0">{icon}</span>
+      <span className="text-neutral-600 text-sm">{label}</span>
+      <span className={`ml-auto text-right font-semibold text-sm ${highlight ? "text-neutral-900" : "text-neutral-900"}`}>
         {value}
       </span>
     </div>
@@ -295,12 +278,12 @@ function DetailTextRow({
   value: string;
 }) {
   return (
-    <div className="py-3 border-b" style={{ borderColor: 'var(--color-border)' }}>
+    <div className="py-3 border-b border-neutral-100">
       <div className="flex items-center gap-3 mb-1.5">
-        <span className="flex-shrink-0" style={{ color: 'var(--color-text-muted)' }}>{icon}</span>
-        <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{label}</span>
+        <span className="text-neutral-400 flex-shrink-0">{icon}</span>
+        <span className="text-neutral-600 text-sm">{label}</span>
       </div>
-      <p className="text-sm leading-relaxed pl-[30px]" style={{ color: 'var(--color-text)' }}>{value}</p>
+      <p className="text-sm text-neutral-900 leading-relaxed pl-[30px]">{value}</p>
     </div>
   );
 }
