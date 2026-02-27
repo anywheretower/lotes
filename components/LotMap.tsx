@@ -375,9 +375,14 @@ export default function LotMap({ lots, amenities }: LotMapProps) {
     {/* ── Footer ── */}
     <footer className="flex-shrink-0 border-t border-neutral-100">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
-        <span className="text-xs text-neutral-400">
-          © {new Date().getFullYear()} Mirador Alto Colbún · Lago Colbún, Región del Maule
-        </span>
+        <div className="flex items-center gap-3">
+          <a href="/admin" className="text-neutral-300 hover:text-neutral-500 transition-colors" aria-label="Admin">
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><circle cx="12" cy="12" r="3" /></svg>
+          </a>
+          <span className="text-xs text-neutral-400">
+            © {new Date().getFullYear()} Mirador Alto Colbún · Lago Colbún, Región del Maule
+          </span>
+        </div>
         <div className="flex items-center gap-4">
           <a href="https://wa.me/56966298663" target="_blank" rel="noopener noreferrer" className="text-xs text-neutral-400 hover:text-neutral-900 transition-colors">
             +56 9 6629 8663
