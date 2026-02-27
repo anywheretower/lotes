@@ -259,7 +259,7 @@ function DetailIconRow({
     <div className="flex items-center gap-3 py-3 border-b border-gray-100">
       <span className="text-gray-400 flex-shrink-0">{icon}</span>
       <span className="text-gray-500 text-sm">{label}</span>
-      <span className={`ml-auto text-right font-semibold text-sm ${highlight ? "text-green-700" : "text-gray-900"}`}>
+      <span className={`ml-auto text-right font-semibold text-sm ${highlight ? "text-[#3771b3]" : "text-gray-900"}`}>
         {value}
       </span>
     </div>

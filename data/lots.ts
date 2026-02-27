@@ -277,9 +277,9 @@ export const lots: Lot[] = [
 
 export const statusColors: Record<LotStatus, string> = {
   Disponible: "#16A34A",
-  Vendido:    "#C62828",
-  Promesado:  "#E65100",
-  Reservado:  "#1565C0",
+  Vendido:    "#3771b3",
+  Promesado:  "#C62828",
+  Reservado:  "#E65100",
 };
 
 export const statusLabels: Record<LotStatus, string> = {
