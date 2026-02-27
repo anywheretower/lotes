@@ -66,7 +66,9 @@ export default function LotMap({ lots, amenities }: LotMapProps) {
   const [filterLinea, setFilterLinea] = useState<LineaFilter>("all");
   const [filterPrice, setFilterPrice] = useState<PriceFilter>("all");
   const [filterDisponible, setFilterDisponible] = useState(false);
+  const [zoom, setZoom] = useState(1);
   const svgRef = useRef<SVGSVGElement>(null);
+  const mapScrollRef = useRef<HTMLDivElement>(null);
 
   const handleHoverStart = useCallback((lot: Lot) => setHoveredLot(lot), []);
   const handleHoverEnd = useCallback(() => setHoveredLot(null), []);
@@ -195,10 +197,37 @@ export default function LotMap({ lots, amenities }: LotMapProps) {
 
     <div className="flex flex-col lg:flex-row gap-0 lg:gap-4 px-4 py-4 sm:px-6 lg:px-8 lg:flex-1 lg:min-h-0 lg:overflow-hidden">
       {/* Map area */}
-      <div className="flex-1 min-w-0 max-w-screen-2xl mx-auto w-full lg:h-full lg:overflow-y-auto">
-        <div className="w-full lg:h-full">
+      <div ref={mapScrollRef} className="relative flex-1 min-w-0 max-w-screen-2xl mx-auto w-full lg:h-full overflow-auto">
+        {/* Zoom controls */}
+        <div className="absolute top-2 right-2 z-20 flex flex-col gap-1">
+          <button
+            onClick={() => { setZoom((z) => Math.min(z + 0.5, 3)); }}
+            className="w-7 h-7 bg-white border border-neutral-200 text-neutral-600 hover:text-neutral-900 hover:border-neutral-400 flex items-center justify-center text-sm font-medium transition-colors shadow-sm"
+            aria-label="Acercar"
+          >
+            +
+          </button>
+          <button
+            onClick={() => { setZoom((z) => Math.max(z - 0.5, 1)); }}
+            disabled={zoom <= 1}
+            className="w-7 h-7 bg-white border border-neutral-200 text-neutral-600 hover:text-neutral-900 hover:border-neutral-400 flex items-center justify-center text-sm font-medium transition-colors shadow-sm disabled:opacity-30 disabled:cursor-default"
+            aria-label="Alejar"
+          >
+            −
+          </button>
+          {zoom > 1 && (
+            <button
+              onClick={() => setZoom(1)}
+              className="w-7 h-7 bg-white border border-neutral-200 text-neutral-600 hover:text-neutral-900 hover:border-neutral-400 flex items-center justify-center transition-colors shadow-sm"
+              aria-label="Restablecer zoom"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" /></svg>
+            </button>
+          )}
+        </div>
         <div
-          className="relative w-full aspect-[850/1100] -mt-[28%] -mb-[18%]"
+          className="relative aspect-[850/1100]"
+          style={{ width: zoom > 1 ? `${zoom * 100}%` : '100%', maxHeight: zoom === 1 ? '100%' : undefined }}
         >
           <img
             src="/plano-base.png"
@@ -335,7 +364,6 @@ export default function LotMap({ lots, amenities }: LotMapProps) {
               <div className="w-2 h-2 bg-gray-900/90 rotate-45 mx-auto -mt-1" />
             </div>
           )}
-        </div>
         </div>
       </div>
 
