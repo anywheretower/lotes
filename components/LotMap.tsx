@@ -28,6 +28,9 @@ const PRICE_OPTIONS: { value: PriceFilter; label: string }[] = [
   { value: "high", label: "> 2.300 UF" },
 ];
 
+/* Cropped viewBox — tight around the lot/amenity content area */
+const VB = { x: 70, y: 280, w: 720, h: 700 };
+
 function matchesFilter(lot: Lot, linea: LineaFilter, price: PriceFilter, soloDisponible: boolean): boolean {
   if (soloDisponible && lot.estado !== "Disponible") return false;
   if (linea !== "all") {
@@ -69,11 +72,35 @@ export default function LotMap({ lots, amenities }: LotMapProps) {
   const [zoom, setZoom] = useState(1);
   const svgRef = useRef<SVGSVGElement>(null);
   const mapScrollRef = useRef<HTMLDivElement>(null);
+  const prevCenterRef = useRef<{ x: number; y: number } | null>(null);
 
   const handleHoverStart = useCallback((lot: Lot) => setHoveredLot(lot), []);
   const handleHoverEnd = useCallback(() => setHoveredLot(null), []);
   const handleAmenityHoverStart = useCallback((a: Amenity) => setHoveredAmenity(a), []);
   const handleAmenityHoverEnd = useCallback(() => setHoveredAmenity(null), []);
+
+  /* Save scroll center before zoom change, restore after render */
+  const saveCenterAndZoom = useCallback((fn: (z: number) => number) => {
+    const c = mapScrollRef.current;
+    if (c && c.scrollWidth > c.clientWidth) {
+      prevCenterRef.current = {
+        x: (c.scrollLeft + c.clientWidth / 2) / c.scrollWidth,
+        y: (c.scrollTop + c.clientHeight / 2) / c.scrollHeight,
+      };
+    }
+    setZoom(fn);
+  }, []);
+
+  useEffect(() => {
+    const center = prevCenterRef.current;
+    const c = mapScrollRef.current;
+    if (!center || !c) return;
+    prevCenterRef.current = null;
+    requestAnimationFrame(() => {
+      c.scrollLeft = center.x * c.scrollWidth - c.clientWidth / 2;
+      c.scrollTop = center.y * c.scrollHeight - c.clientHeight / 2;
+    });
+  }, [zoom]);
 
   useEffect(() => {
     const currentParam = searchParams.get("lote");
@@ -201,14 +228,14 @@ export default function LotMap({ lots, amenities }: LotMapProps) {
         {/* Zoom controls */}
         <div className="absolute top-2 right-2 z-20 flex flex-col gap-1">
           <button
-            onClick={() => { setZoom((z) => Math.min(z + 0.5, 3)); }}
+            onClick={() => saveCenterAndZoom((z) => Math.min(z + 0.2, 3))}
             className="w-7 h-7 bg-white border border-neutral-200 text-neutral-600 hover:text-neutral-900 hover:border-neutral-400 flex items-center justify-center text-sm font-medium transition-colors shadow-sm"
             aria-label="Acercar"
           >
             +
           </button>
           <button
-            onClick={() => { setZoom((z) => Math.max(z - 0.5, 1)); }}
+            onClick={() => saveCenterAndZoom((z) => Math.max(z - 0.2, 1))}
             disabled={zoom <= 1}
             className="w-7 h-7 bg-white border border-neutral-200 text-neutral-600 hover:text-neutral-900 hover:border-neutral-400 flex items-center justify-center text-sm font-medium transition-colors shadow-sm disabled:opacity-30 disabled:cursor-default"
             aria-label="Alejar"
@@ -226,22 +253,22 @@ export default function LotMap({ lots, amenities }: LotMapProps) {
           )}
         </div>
         <div
-          className="relative aspect-[850/1100]"
-          style={{ width: zoom > 1 ? `${zoom * 100}%` : '100%', maxHeight: zoom === 1 ? '100%' : undefined }}
+          className="relative"
+          style={{
+            aspectRatio: `${VB.w} / ${VB.h}`,
+            width: zoom > 1 ? `${zoom * 100}%` : "100%",
+            maxHeight: zoom === 1 ? "100%" : undefined,
+          }}
         >
-          <img
-            src="/plano-base.png"
-            alt="Plano Mirador Alto Colbún"
-            className="absolute inset-0 w-full h-full object-contain"
-            draggable={false}
-          />
-
           <svg
             ref={svgRef}
-            viewBox="0 0 850 1100"
+            viewBox={`${VB.x} ${VB.y} ${VB.w} ${VB.h}`}
             className="absolute inset-0 w-full h-full"
             preserveAspectRatio="xMidYMid meet"
           >
+            {/* Background image — rendered inside SVG so viewBox crops it */}
+            <image href="/plano-base.png" x="0" y="0" width="850" height="1100" />
+
             <text
               x={500}
               y={345}
@@ -329,8 +356,8 @@ export default function LotMap({ lots, amenities }: LotMapProps) {
             <div
               className="absolute pointer-events-none z-30 transition-opacity duration-100"
               style={{
-                left: `${(hoveredLot.coords.cx / 850) * 100}%`,
-                top: `${(hoveredLot.coords.cy / 1100) * 100}%`,
+                left: `${((hoveredLot.coords.cx - VB.x) / VB.w) * 100}%`,
+                top: `${((hoveredLot.coords.cy - VB.y) / VB.h) * 100}%`,
                 transform: "translate(-50%, -120%)",
               }}
             >
@@ -353,8 +380,8 @@ export default function LotMap({ lots, amenities }: LotMapProps) {
             <div
               className="absolute pointer-events-none z-30 transition-opacity duration-100"
               style={{
-                left: `${(hoveredAmenity.coords.cx / 850) * 100}%`,
-                top: `${(hoveredAmenity.coords.cy / 1100) * 100}%`,
+                left: `${((hoveredAmenity.coords.cx - VB.x) / VB.w) * 100}%`,
+                top: `${((hoveredAmenity.coords.cy - VB.y) / VB.h) * 100}%`,
                 transform: "translate(-50%, -120%)",
               }}
             >
