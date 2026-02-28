@@ -228,7 +228,7 @@ export default function LotMap({ lots, amenities }: LotMapProps) {
       {/* Map area */}
       <div className="relative flex-1 min-w-0 max-w-screen-2xl mx-auto w-full lg:h-full">
         {/* Zoom controls — fixed relative to map area, not scrollable content */}
-        <div className="absolute top-2 right-2 z-20 flex flex-col gap-1">
+        <div className="absolute top-2 right-5 z-20 flex flex-col gap-1">
           <button
             onClick={() => saveCenterAndZoom((z) => Math.min(z + 0.1, 3))}
             className="w-7 h-7 bg-neutral-900 text-white hover:bg-neutral-700 flex items-center justify-center text-sm font-medium transition-colors shadow-sm"
