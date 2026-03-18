@@ -2,6 +2,59 @@
 
 import { useState, useRef } from "react";
 
+const MAX_SIZE = 3 * 1024 * 1024; // 3MB - safe under Vercel's 4.5MB limit
+const MAX_DIMENSION = 2048;
+
+function compressImage(file: File): Promise<File> {
+  return new Promise((resolve, reject) => {
+    if (file.size <= MAX_SIZE && !file.type.startsWith("image/")) {
+      resolve(file);
+      return;
+    }
+
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+
+      let { width, height } = img;
+      if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+        const ratio = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) { reject(new Error("No canvas context")); return; }
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // Start at 0.85 quality, reduce if still too large
+      let quality = 0.85;
+      const tryCompress = () => {
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) { reject(new Error("Compression failed")); return; }
+            if (blob.size > MAX_SIZE && quality > 0.3) {
+              quality -= 0.15;
+              tryCompress();
+              return;
+            }
+            resolve(new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }));
+          },
+          "image/jpeg",
+          quality,
+        );
+      };
+      tryCompress();
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("No se pudo leer la imagen")); };
+    img.src = url;
+  });
+}
+
 interface ImageUploaderProps {
   images: string[];
   entityType: "lotes" | "equipamiento";
@@ -27,8 +80,10 @@ export default function ImageUploader({
 
     setUploading(true);
     try {
+      const compressed = await compressImage(files[0]);
+
       const formData = new FormData();
-      formData.append("file", files[0]);
+      formData.append("file", compressed);
       formData.append("entityType", entityType);
       formData.append("entityId", String(entityId));
 
