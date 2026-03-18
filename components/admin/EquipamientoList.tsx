@@ -15,9 +15,9 @@ export default function EquipamientoList({ items }: EquipamientoListProps) {
           href={`/admin/equipamiento/${item.id}`}
           className="bg-white border border-neutral-200 p-4 hover:border-neutral-400 transition-colors group"
         >
-          {item.foto ? (
+          {item.fotos?.length > 0 ? (
             <img
-              src={item.foto}
+              src={item.fotos[0]}
               alt={item.nombre}
               className="w-full h-24 object-cover mb-3"
             />

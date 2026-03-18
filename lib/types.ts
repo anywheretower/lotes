@@ -28,7 +28,7 @@ export interface AmenityRow {
   inicial: string;
   cx: number;
   cy: number;
-  foto: string | null;
+  fotos: string[];
   notas: string | null;
   created_at: string;
   updated_at: string;
@@ -57,7 +57,7 @@ export interface Amenity {
   nombre: string;
   inicial: string;
   coords: { cx: number; cy: number };
-  foto: string | null;
+  fotos: string[];
   notas: string | null;
 }
 
@@ -87,7 +87,7 @@ export function amenityRowToAmenity(row: AmenityRow): Amenity {
     nombre: row.nombre,
     inicial: row.inicial,
     coords: { cx: row.cx, cy: row.cy },
-    foto: row.foto,
+    fotos: row.fotos ?? [],
     notas: row.notas,
   };
 }

@@ -20,7 +20,7 @@ export default function EquipamientoEditForm({ item }: EquipamientoEditFormProps
   const [notas, setNotas] = useState(item.notas ?? "");
   const [cx, setCx] = useState(item.cx);
   const [cy, setCy] = useState(item.cy);
-  const [foto, setFoto] = useState<string[]>(item.foto ? [item.foto] : []);
+  const [fotos, setFotos] = useState<string[]>(item.fotos ?? []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,12 +97,13 @@ export default function EquipamientoEditForm({ item }: EquipamientoEditFormProps
 
       {/* Foto */}
       <div className="border border-neutral-200 bg-white p-4">
-        <h3 className="text-[10px] font-medium uppercase tracking-wider text-neutral-400 mb-4">Foto</h3>
+        <h3 className="text-[10px] font-medium uppercase tracking-wider text-neutral-400 mb-4">Fotos</h3>
         <ImageUploader
-          images={foto}
+          images={fotos}
           entityType="equipamiento"
           entityId={item.id}
-          onUploadComplete={setFoto}
+          multiple
+          onUploadComplete={setFotos}
         />
       </div>
 

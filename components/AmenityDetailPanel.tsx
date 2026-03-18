@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { Amenity } from "@/lib/types";
 import { AMENITY_COLOR } from "@/lib/constants";
 
@@ -8,8 +9,74 @@ interface AmenityDetailPanelProps {
   onClose: () => void;
 }
 
+function PhotoCarousel({ photos, nombre, onClose }: {
+  photos: string[];
+  nombre: string;
+  onClose: () => void;
+}) {
+  const [idx, setIdx] = useState(0);
+  const current = photos[idx];
+
+  return (
+    <div className="relative h-44 w-full bg-neutral-100">
+      <img
+        src={current}
+        alt={`${nombre} - foto ${idx + 1}`}
+        className="w-full h-full object-cover"
+      />
+      {photos.length > 1 && (
+        <>
+          <button
+            onClick={() => setIdx((i) => (i - 1 + photos.length) % photos.length)}
+            className="absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 text-white hover:bg-black/70 transition-colors"
+            aria-label="Foto anterior"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <button
+            onClick={() => setIdx((i) => (i + 1) % photos.length)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 text-white hover:bg-black/70 transition-colors"
+            aria-label="Foto siguiente"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+            {photos.map((_, i) => (
+              <span
+                key={i}
+                className={`w-1.5 h-1.5 rounded-full ${i === idx ? "bg-white" : "bg-white/50"}`}
+              />
+            ))}
+          </div>
+        </>
+      )}
+      <span
+        className="absolute bottom-3 left-4 text-xs font-medium px-2 py-0.5 bg-white/80"
+        style={{ color: AMENITY_COLOR }}
+      >
+        Equipamiento
+      </span>
+      <button
+        onClick={onClose}
+        className="absolute top-3 right-3 p-1.5 bg-white/80 hover:bg-white transition-colors"
+        aria-label="Cerrar panel"
+      >
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
 export default function AmenityDetailPanel({ amenity, onClose }: AmenityDetailPanelProps) {
   if (!amenity) return null;
+
+  const hasPhotos = amenity.fotos.length > 0;
 
   return (
     <>
@@ -21,30 +88,9 @@ export default function AmenityDetailPanel({ amenity, onClose }: AmenityDetailPa
 
       {/* Panel */}
       <div className="fixed right-0 top-0 h-full w-full sm:w-96 bg-white z-50 lg:static lg:z-auto overflow-y-auto lg:border lg:border-neutral-100">
-        {/* Header with tint or photo */}
-        {amenity.foto ? (
-          <div className="relative h-44 w-full bg-neutral-100">
-            <img
-              src={amenity.foto}
-              alt={amenity.nombre}
-              className="w-full h-full object-cover"
-            />
-            <span
-              className="absolute bottom-3 left-4 text-xs font-medium px-2 py-0.5 bg-white/80"
-              style={{ color: AMENITY_COLOR }}
-            >
-              Equipamiento
-            </span>
-            <button
-              onClick={onClose}
-              className="absolute top-3 right-3 p-1.5 bg-white/80 hover:bg-white transition-colors"
-              aria-label="Cerrar panel"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
+        {/* Header with photos or tint */}
+        {hasPhotos ? (
+          <PhotoCarousel photos={amenity.fotos} nombre={amenity.nombre} onClose={onClose} />
         ) : (
           <div
             className="relative h-44 w-full flex items-center justify-center"
@@ -96,7 +142,7 @@ export default function AmenityDetailPanel({ amenity, onClose }: AmenityDetailPa
             </div>
           )}
 
-          {!amenity.foto && !amenity.notas && (
+          {!hasPhotos && !amenity.notas && (
             <p className="text-sm text-neutral-400 text-center py-6">
               Sin información adicional.
             </p>

@@ -45,16 +45,25 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ images: newFotos });
   } else if (entityType === "equipamiento") {
+    const { data: item } = await supabase
+      .from("equipamiento")
+      .select("fotos")
+      .eq("id", entityId)
+      .single();
+
+    const currentFotos = (item?.fotos as string[]) ?? [];
+    const newFotos = currentFotos.filter((f) => f !== imageUrl);
+
     const { error: dbError } = await supabase
       .from("equipamiento")
-      .update({ foto: null })
+      .update({ fotos: newFotos })
       .eq("id", entityId);
 
     if (dbError) {
       return NextResponse.json({ error: dbError.message }, { status: 500 });
     }
 
-    return NextResponse.json({ images: [] });
+    return NextResponse.json({ images: newFotos });
   }
 
   return NextResponse.json({ error: "Tipo no válido" }, { status: 400 });
