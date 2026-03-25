@@ -133,7 +133,7 @@ export default function LotMap({ lots, amenities }: LotMapProps) {
         {/* Row 1: Title + Legend */}
         <div className="px-4 sm:px-6 lg:px-8 py-4 border-b border-neutral-100">
           <div className="max-w-screen-2xl mx-auto flex items-center justify-between">
-            <img src="/logo.png" alt="Mirador Alto Colbún" className="h-8 sm:h-10" />
+            <img src="/logo.png" alt="Mirador Alto Colbún" className="h-10 sm:h-12" />
             <Legend lots={lots} />
           </div>
         </div>
