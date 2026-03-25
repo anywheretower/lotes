@@ -382,7 +382,7 @@ export default function LotMap({ lots, amenities }: LotMapProps) {
               <h2 className="text-sm font-semibold tracking-tight">
                 Bienvenido a Mirador Alto Colbún
               </h2>
-              <p className="text-xs text-neutral-400 mt-1">Explora los sitios disponibles en el plano interactivo</p>
+              <p className="text-xs text-neutral-400 mt-1">Explora los sitios disponibles en el plano interactivo y el equipamiento con espacios comunes de condominio</p>
             </div>
 
             <div className="p-5 space-y-5">
