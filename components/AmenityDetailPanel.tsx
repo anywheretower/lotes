@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import type { Amenity } from "@/lib/types";
 import { AMENITY_COLOR } from "@/lib/constants";
 
@@ -18,11 +19,15 @@ function PhotoCarousel({ photos, nombre, onClose }: {
   const current = photos[idx];
 
   return (
-    <div className="relative h-44 w-full bg-neutral-100">
-      <img
+    <div className="relative w-full bg-neutral-100" style={{ aspectRatio: "16/9" }}>
+      <Image
         src={current}
         alt={`${nombre} - foto ${idx + 1}`}
-        className="w-full h-full object-cover"
+        fill
+        sizes="(max-width: 1024px) 100vw, 384px"
+        className="object-cover"
+        quality={75}
+        priority={idx === 0}
       />
       {photos.length > 1 && (
         <>
@@ -93,8 +98,9 @@ export default function AmenityDetailPanel({ amenity, onClose }: AmenityDetailPa
           <PhotoCarousel photos={amenity.fotos} nombre={amenity.nombre} onClose={onClose} />
         ) : (
           <div
-            className="relative h-44 w-full flex items-center justify-center"
+            className="relative w-full flex items-center justify-center"
             style={{
+              aspectRatio: "16/9",
               background: `linear-gradient(135deg, ${AMENITY_COLOR}15 0%, ${AMENITY_COLOR}30 100%)`,
             }}
           >

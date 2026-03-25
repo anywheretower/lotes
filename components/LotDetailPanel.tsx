@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import type { Lot } from "@/lib/types";
 import { statusColors } from "@/lib/constants";
 
@@ -131,8 +132,9 @@ export default function LotDetailPanel({ lot, onClose }: LotDetailPanelProps) {
           <PhotoCarousel photos={realPhotos} lotId={lot.id} statusColor={statusColor} onClose={onClose} />
         ) : (
           <div
-            className="relative h-44 w-full flex items-center justify-center"
+            className="relative w-full flex items-center justify-center"
             style={{
+              aspectRatio: "16/9",
               background: `linear-gradient(135deg, ${statusColor}15 0%, ${statusColor}30 100%)`,
             }}
           >
@@ -263,11 +265,15 @@ function PhotoCarousel({ photos, lotId, statusColor, onClose }: {
   const current = photos[idx];
 
   return (
-    <div className="relative h-44 w-full bg-neutral-100">
-      <img
+    <div className="relative w-full bg-neutral-100" style={{ aspectRatio: "16/9" }}>
+      <Image
         src={current}
         alt={`Sitio ${lotId} - foto ${idx + 1}`}
-        className="w-full h-full object-cover"
+        fill
+        sizes="(max-width: 1024px) 100vw, 384px"
+        className="object-cover"
+        quality={75}
+        priority={idx === 0}
       />
       {photos.length > 1 && (
         <>

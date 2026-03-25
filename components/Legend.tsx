@@ -16,7 +16,7 @@ export default function Legend({ lots }: LegendProps) {
     {} as Record<LotStatus, number>
   );
 
-  const statuses: LotStatus[] = ["Vendido", "Disponible", "Promoción", "Reservado"];
+  const statuses: LotStatus[] = ["Promoción", "Disponible", "Vendido", "Reservado"];
   const disponibles = counts["Disponible"] || 0;
   const total = lots.length;
 
@@ -28,7 +28,6 @@ export default function Legend({ lots }: LegendProps) {
       <span className="hidden sm:block w-px h-4 bg-neutral-200" />
       {statuses.map((status) => {
         const count = counts[status] || 0;
-        if (count === 0) return null;
         return (
           <div key={status} className="flex items-center gap-1.5">
             <div

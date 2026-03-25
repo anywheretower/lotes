@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import type { Lot, Amenity, Linea } from "@/lib/types";
+import type { Lot, Amenity } from "@/lib/types";
 import { statusColors } from "@/lib/constants";
 import LotCircle from "./LotCircle";
 import LotDetailPanel from "./LotDetailPanel";
@@ -10,41 +10,16 @@ import AmenityCircle from "./AmenityCircle";
 import AmenityDetailPanel from "./AmenityDetailPanel";
 import Legend from "./Legend";
 
-type LineaFilter = "all" | Linea | "otros";
-type PriceFilter = "all" | "low" | "mid" | "high";
-
-const LINEA_OPTIONS: { value: LineaFilter; label: string }[] = [
-  { value: "all", label: "Todas" },
-  { value: "1ª Línea", label: "1ª Línea" },
-  { value: "2ª Línea", label: "2ª Línea" },
-  { value: "3ª Línea", label: "3ª Línea" },
-  { value: "otros", label: "Otros" },
-];
-
-const PRICE_OPTIONS: { value: PriceFilter; label: string }[] = [
-  { value: "all", label: "Todos" },
-  { value: "low", label: "≤ 2.000 UF" },
-  { value: "mid", label: "2.000 – 2.300 UF" },
-  { value: "high", label: "> 2.300 UF" },
-];
-
 /* Cropped viewBox — tight around the lot/amenity content area */
 const VB = { x: 70, y: 280, w: 720, h: 700 };
 
-function matchesFilter(lot: Lot, linea: LineaFilter, price: PriceFilter, soloDisponible: boolean): boolean {
-  if (soloDisponible && lot.estado !== "Disponible") return false;
-  if (linea !== "all") {
-    if (linea === "otros") {
-      if (lot.linea !== null) return false;
-    } else {
-      if (lot.linea !== linea) return false;
-    }
-  }
-  if (price !== "all" && lot.estado === "Disponible") {
-    if (price === "low" && lot.precio > 2000) return false;
-    if (price === "mid" && (lot.precio <= 2000 || lot.precio > 2300)) return false;
-    if (price === "high" && lot.precio <= 2300) return false;
-  }
+type SimpleFilter = "disponible" | "conCasa" | "comercial";
+
+function matchesFilter(lot: Lot, filters: Set<SimpleFilter>): boolean {
+  if (filters.size === 0) return true;
+  if (filters.has("disponible") && lot.estado !== "Disponible") return false;
+  if (filters.has("conCasa") && !lot.tieneCasa) return false;
+  if (filters.has("comercial") && lot.familiaPropietaria !== "COMERCIAL") return false;
   return true;
 }
 
@@ -66,9 +41,7 @@ export default function LotMap({ lots, amenities }: LotMapProps) {
   const [hoveredLot, setHoveredLot] = useState<Lot | null>(null);
   const [selectedAmenity, setSelectedAmenity] = useState<Amenity | null>(null);
   const [hoveredAmenity, setHoveredAmenity] = useState<Amenity | null>(null);
-  const [filterLinea, setFilterLinea] = useState<LineaFilter>("all");
-  const [filterPrice, setFilterPrice] = useState<PriceFilter>("all");
-  const [filterDisponible, setFilterDisponible] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<Set<SimpleFilter>>(new Set());
   const [zoom, setZoom] = useState(1);
   const svgRef = useRef<SVGSVGElement>(null);
   const mapScrollRef = useRef<HTMLDivElement>(null);
@@ -76,6 +49,20 @@ export default function LotMap({ lots, amenities }: LotMapProps) {
 
   const handleHoverStart = useCallback((lot: Lot) => setHoveredLot(lot), []);
   const handleHoverEnd = useCallback(() => setHoveredLot(null), []);
+
+  /** Convert SVG coords to % position relative to the inner wrapper div */
+  const svgToPercent = useCallback((svgX: number, svgY: number) => {
+    const svg = svgRef.current;
+    if (!svg) return { left: "0%", top: "0%" };
+    const pt = svg.createSVGPoint();
+    pt.x = svgX;
+    pt.y = svgY;
+    const screenPt = pt.matrixTransform(svg.getScreenCTM()!);
+    const rect = svg.getBoundingClientRect();
+    const pctX = ((screenPt.x - rect.left) / rect.width) * 100;
+    const pctY = ((screenPt.y - rect.top) / rect.height) * 100;
+    return { left: `${pctX}%`, top: `${pctY}%` };
+  }, []);
   const handleAmenityHoverStart = useCallback((a: Amenity) => setHoveredAmenity(a), []);
   const handleAmenityHoverEnd = useCallback(() => setHoveredAmenity(null), []);
 
@@ -128,8 +115,16 @@ export default function LotMap({ lots, amenities }: LotMapProps) {
     setSelectedAmenity(null);
   };
 
-  const hasActiveFilter = filterLinea !== "all" || filterPrice !== "all" || filterDisponible;
-  const matchCount = hasActiveFilter ? lots.filter((l) => matchesFilter(l, filterLinea, filterPrice, filterDisponible)).length : 0;
+  const toggleFilter = (f: SimpleFilter) => {
+    setActiveFilters((prev) => {
+      const next = new Set(prev);
+      if (next.has(f)) next.delete(f); else next.add(f);
+      return next;
+    });
+  };
+
+  const hasActiveFilter = activeFilters.size > 0;
+  const matchCount = hasActiveFilter ? lots.filter((l) => matchesFilter(l, activeFilters)).length : 0;
 
   return (
     <div className="lg:h-full lg:flex lg:flex-col lg:overflow-hidden">
@@ -148,61 +143,33 @@ export default function LotMap({ lots, amenities }: LotMapProps) {
         {/* Row 2: Filters */}
         <div className="px-4 sm:px-6 lg:px-8 py-3">
           <div className="max-w-screen-2xl mx-auto flex flex-wrap items-center gap-x-6 gap-y-2">
-            {/* Ubicación */}
+            {/* Filtros */}
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Ubicación</span>
+              <span className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Filtrar</span>
               <div className="flex gap-1">
-                {LINEA_OPTIONS.map((opt) => (
+                {([
+                  { key: "disponible" as SimpleFilter, label: "Disponibles", activeClass: "bg-[#16A34A] text-white" },
+                  { key: "conCasa" as SimpleFilter, label: "Con casa", activeClass: "bg-neutral-900 text-white", icon: (
+                    <svg className="w-3 h-3 inline-block mr-1" viewBox="-5 -5 10 10" fill="currentColor"><path d="M0-4L-4 0V3.5H-1.3V0.7H1.3V3.5H4V0Z" /></svg>
+                  ) },
+                  { key: "comercial" as SimpleFilter, label: "Comercial", activeClass: "bg-neutral-900 text-white", icon: (
+                    <svg className="w-3 h-3 inline-block mr-1" viewBox="-5 -5 10 10" fill="currentColor"><path d="M-3.5-1.5H3.5V-3H-3.5ZM-3.5 0H-2V-1H2V0H3.5V-1.5H-3.5ZM-3 3.5H-1V1.5H1V3.5H3V0H-3Z" /></svg>
+                  ) },
+                ]).map((opt) => (
                   <button
-                    key={opt.value}
-                    onClick={() => setFilterLinea(filterLinea === opt.value ? "all" : opt.value)}
+                    key={opt.key}
+                    onClick={() => toggleFilter(opt.key)}
                     className={`px-3 py-1 text-[11px] font-medium text-center transition-colors ${
-                      filterLinea === opt.value
-                        ? "bg-neutral-900 text-white"
+                      activeFilters.has(opt.key)
+                        ? opt.activeClass
                         : "text-neutral-500 hover:text-neutral-900 border border-neutral-200 hover:border-neutral-900"
                     }`}
                   >
-                    {opt.label}
+                    {"icon" in opt && opt.icon}{opt.label}
                   </button>
                 ))}
               </div>
             </div>
-
-            <div className="hidden sm:block w-px h-5 bg-neutral-100" />
-
-            {/* Precio */}
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Precio</span>
-              <div className="flex gap-1">
-                {PRICE_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.value}
-                    onClick={() => setFilterPrice(filterPrice === opt.value ? "all" : opt.value)}
-                    className={`px-3 py-1 text-[11px] font-medium text-center transition-colors ${
-                      filterPrice === opt.value
-                        ? "bg-neutral-900 text-white"
-                        : "text-neutral-500 hover:text-neutral-900 border border-neutral-200 hover:border-neutral-900"
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="hidden sm:block w-px h-5 bg-neutral-100" />
-
-            {/* Solo disponibles */}
-            <button
-              onClick={() => setFilterDisponible(!filterDisponible)}
-              className={`px-3 py-1 text-[11px] font-medium text-center transition-colors ${
-                filterDisponible
-                  ? "bg-green-600 text-white"
-                  : "text-neutral-500 hover:text-neutral-900 border border-neutral-200 hover:border-neutral-900"
-              }`}
-            >
-              Solo disponibles
-            </button>
 
             {hasActiveFilter && (
               <>
@@ -212,7 +179,7 @@ export default function LotMap({ lots, amenities }: LotMapProps) {
                     {matchCount} sitio{matchCount !== 1 ? "s" : ""} coinciden
                   </span>
                   <button
-                    onClick={() => { setFilterLinea("all"); setFilterPrice("all"); setFilterDisponible(false); }}
+                    onClick={() => setActiveFilters(new Set())}
                     className="text-[11px] text-red-500 hover:text-red-600 font-medium transition-colors"
                   >
                     Limpiar
@@ -331,7 +298,7 @@ export default function LotMap({ lots, amenities }: LotMapProps) {
                   key={lot.id}
                   lot={lot}
                   isSelected={selectedLot?.id === lot.id}
-                  dimmed={hasActiveFilter && !matchesFilter(lot, filterLinea, filterPrice, filterDisponible)}
+                  dimmed={hasActiveFilter && !matchesFilter(lot, activeFilters)}
                   onSelect={handleSelect}
                   onHoverStart={handleHoverStart}
                   onHoverEnd={handleHoverEnd}
@@ -352,15 +319,18 @@ export default function LotMap({ lots, amenities }: LotMapProps) {
                 />
               ))}
             </g>
+
           </svg>
 
           {/* ── Hover tooltip ── */}
-          {hoveredLot && hoveredLot.id !== selectedLot?.id && (
+          {hoveredLot && hoveredLot.id !== selectedLot?.id && (() => {
+            const pos = svgToPercent(hoveredLot.coords.cx, hoveredLot.coords.cy);
+            return (
             <div
               className="absolute pointer-events-none z-30 transition-opacity duration-100"
               style={{
-                left: `${((hoveredLot.coords.cx - VB.x) / VB.w) * 100}%`,
-                top: `${((hoveredLot.coords.cy - VB.y) / VB.h) * 100}%`,
+                left: pos.left,
+                top: pos.top,
                 transform: "translate(-50%, -120%)",
               }}
             >
@@ -376,24 +346,28 @@ export default function LotMap({ lots, amenities }: LotMapProps) {
               </div>
               <div className="w-2 h-2 bg-neutral-900 rotate-45 mx-auto -mt-1" />
             </div>
-          )}
+            );
+          })()}
 
           {/* ── Amenity hover tooltip ── */}
-          {hoveredAmenity && hoveredAmenity.id !== selectedAmenity?.id && (
+          {hoveredAmenity && hoveredAmenity.id !== selectedAmenity?.id && (() => {
+            const pos = svgToPercent(hoveredAmenity.coords.cx, hoveredAmenity.coords.cy);
+            return (
             <div
               className="absolute pointer-events-none z-30 transition-opacity duration-100"
               style={{
-                left: `${((hoveredAmenity.coords.cx - VB.x) / VB.w) * 100}%`,
-                top: `${((hoveredAmenity.coords.cy - VB.y) / VB.h) * 100}%`,
+                left: pos.left,
+                top: pos.top,
                 transform: "translate(-50%, -120%)",
               }}
             >
-              <div className="bg-gray-900/90 text-white rounded-lg px-3 py-2 text-xs whitespace-nowrap shadow-lg backdrop-blur-sm">
+              <div className="bg-neutral-900 text-white px-3 py-2 text-xs whitespace-nowrap">
                 <div className="font-bold text-sm">{hoveredAmenity.nombre}</div>
               </div>
-              <div className="w-2 h-2 bg-gray-900/90 rotate-45 mx-auto -mt-1" />
+              <div className="w-2 h-2 bg-neutral-900 rotate-45 mx-auto -mt-1" />
             </div>
-          )}
+            );
+          })()}
         </div>
         </div>
       </div>
@@ -415,10 +389,10 @@ export default function LotMap({ lots, amenities }: LotMapProps) {
 
             <div className="p-5 space-y-5">
               <div className="space-y-4">
-                <WelcomeStep number={1} title="Explora el plano" description="Pasa el cursor sobre los círculos numerados para ver un resumen rápido de cada sitio." />
-                <WelcomeStep number={2} title="Selecciona un sitio" description="Haz clic en cualquier sitio para ver su ficha completa con superficie, precio, ubicación y más." />
-                <WelcomeStep number={3} title="Filtra por ubicación o precio" description="Usa los filtros de arriba del plano para encontrar sitios según tu preferencia." />
-                <WelcomeStep number={4} title="Consulta por WhatsApp" description="¿Te interesa un sitio? Desde su ficha puedes contactarnos directamente." />
+                <WelcomeStep number={1} title="Explora el plano" description="Pasa el cursor sobre los sitios numerados para ver un resumen con superficie, precio y estado." />
+                <WelcomeStep number={2} title="Abre la ficha del sitio" description="Haz clic en un sitio para ver todos sus detalles, fotos y opciones de financiamiento." />
+                <WelcomeStep number={3} title="Filtra lo que buscas" description="Usa los filtros para ver solo sitios disponibles, con casa construida o de uso comercial." />
+                <WelcomeStep number={4} title="Consulta por WhatsApp" description="Desde la ficha de cada sitio puedes escribirnos directamente para agendar una visita." />
               </div>
 
               <div className="border border-neutral-100 p-4">
