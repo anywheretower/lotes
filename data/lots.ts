@@ -1,4 +1,4 @@
-export type LotStatus = "Disponible" | "Vendido" | "Promesado" | "Reservado";
+export type LotStatus = "Disponible" | "Vendido" | "Promoción" | "Reservado";
 
 export type Linea = "1ª Línea" | "2ª Línea" | "3ª Línea";
 
@@ -207,7 +207,7 @@ export const lots: Lot[] = [
   buildLot({ id: 8,  superficie: 1520.0, estado: "Vendido",    precio: 1990 }),
   buildLot({ id: 9,  superficie: 1520.0, estado: "Disponible", precio: 1990 }),
   buildLot({ id: 10, superficie: 1520.0, estado: "Disponible", precio: 1990 }),
-  buildLot({ id: 11, superficie: 1551.0, estado: "Promesado",  precio: 1873 }),
+  buildLot({ id: 11, superficie: 1551.0, estado: "Promoción",  precio: 1873 }),
   buildLot({ id: 12, superficie: 1584.0, estado: "Disponible", precio: 1990 }),
   buildLot({ id: 13, superficie: 1541.0, estado: "Disponible", precio: 1990 }),
   buildLot({ id: 14, superficie: 2034.9, estado: "Disponible", precio: 1990 }),
@@ -217,7 +217,7 @@ export const lots: Lot[] = [
   buildLot({ id: 18, superficie: 1503.6, estado: "Disponible", precio: 1990 }),
   buildLot({ id: 19, superficie: 1500.0, estado: "Disponible", precio: 1990 }),
   buildLot({ id: 20, superficie: 1500.0, estado: "Disponible", precio: 1990 }),
-  buildLot({ id: 21, superficie: 1500.0, estado: "Promesado",  precio: 1990 }),
+  buildLot({ id: 21, superficie: 1500.0, estado: "Promoción",  precio: 1990 }),
   buildLot({ id: 22, superficie: 1500.0, estado: "Vendido",    precio: 1990 }),
   buildLot({ id: 23, superficie: 1500.0, estado: "Vendido",    precio: 1990 }),
   buildLot({ id: 24, superficie: 1500.0, estado: "Vendido",    precio: 1990 }),
@@ -277,14 +277,14 @@ export const lots: Lot[] = [
 
 export const statusColors: Record<LotStatus, string> = {
   Disponible: "#16A34A",
-  Vendido:    "#3771b3",
-  Promesado:  "#C62828",
+  Vendido:    "#C62828",
+  Promoción:  "#EAB308",
   Reservado:  "#E65100",
 };
 
 export const statusLabels: Record<LotStatus, string> = {
   Disponible: "Disponible",
   Vendido:    "Vendido",
-  Promesado:  "Promesado",
+  Promoción:  "Promoción",
   Reservado:  "Reservado",
 };

@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS lotes (
   id INTEGER PRIMARY KEY,
   superficie NUMERIC(10,1) NOT NULL,
   estado TEXT NOT NULL DEFAULT 'Disponible'
-    CHECK (estado IN ('Disponible','Vendido','Promesado','Reservado')),
+    CHECK (estado IN ('Disponible','Vendido','Promoción','Reservado')),
   precio NUMERIC(10,0) NOT NULL,
   linea TEXT CHECK (linea IN ('1ª Línea','2ª Línea','3ª Línea') OR linea IS NULL),
   cx NUMERIC(8,1) NOT NULL,

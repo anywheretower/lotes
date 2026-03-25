@@ -9,7 +9,7 @@ interface LoteEditFormProps {
   lote: LotRow;
 }
 
-const ESTADOS: LotStatus[] = ["Disponible", "Vendido", "Promesado", "Reservado"];
+const ESTADOS: LotStatus[] = ["Disponible", "Vendido", "Promoción", "Reservado"];
 const LINEAS: (Linea | "")[] = ["", "1ª Línea", "2ª Línea", "3ª Línea"];
 
 export default function LoteEditForm({ lote }: LoteEditFormProps) {

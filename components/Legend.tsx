@@ -16,7 +16,7 @@ export default function Legend({ lots }: LegendProps) {
     {} as Record<LotStatus, number>
   );
 
-  const statuses: LotStatus[] = ["Vendido", "Disponible", "Promesado", "Reservado"];
+  const statuses: LotStatus[] = ["Vendido", "Disponible", "Promoción", "Reservado"];
   const disponibles = counts["Disponible"] || 0;
   const total = lots.length;
 

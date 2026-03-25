@@ -1,6 +1,6 @@
 // ── Database row types (match Supabase columns) ─────────────────────
 
-export type LotStatus = "Disponible" | "Vendido" | "Promesado" | "Reservado";
+export type LotStatus = "Disponible" | "Vendido" | "Promoción" | "Reservado";
 export type Linea = "1ª Línea" | "2ª Línea" | "3ª Línea";
 
 export interface LotRow {

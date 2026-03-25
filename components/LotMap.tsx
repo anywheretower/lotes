@@ -426,8 +426,8 @@ export default function LotMap({ lots, amenities }: LotMapProps) {
                 <div className="grid grid-cols-2 gap-2">
                   {[
                     { color: "#16A34A", label: "Disponible" },
-                    { color: "#3771b3", label: "Vendido" },
-                    { color: "#C62828", label: "Promesado" },
+                    { color: "#C62828", label: "Vendido" },
+                    { color: "#EAB308", label: "Promoción" },
                     { color: "#E65100", label: "Reservado" },
                   ].map((item) => (
                     <div key={item.label} className="flex items-center gap-2">

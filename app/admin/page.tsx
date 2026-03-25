@@ -21,7 +21,7 @@ export default async function AdminLotesPage() {
     total: lotes.length,
     disponible: lotes.filter((l) => l.estado === "Disponible").length,
     vendido: lotes.filter((l) => l.estado === "Vendido").length,
-    promesado: lotes.filter((l) => l.estado === "Promesado").length,
+    promocion: lotes.filter((l) => l.estado === "Promoción").length,
     reservado: lotes.filter((l) => l.estado === "Reservado").length,
   };
 
@@ -31,7 +31,7 @@ export default async function AdminLotesPage() {
         <div>
           <h2 className="text-lg font-semibold text-neutral-900">Lotes</h2>
           <p className="text-xs text-neutral-500 mt-0.5">
-            {stats.total} total · {stats.disponible} disponibles · {stats.vendido} vendidos · {stats.promesado} promesados · {stats.reservado} reservados
+            {stats.total} total · {stats.disponible} disponibles · {stats.vendido} vendidos · {stats.promocion} en promoción · {stats.reservado} reservados
           </p>
         </div>
       </div>
