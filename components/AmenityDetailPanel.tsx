@@ -33,7 +33,7 @@ function PhotoCarousel({ photos, nombre, onClose }: {
         <>
           <button
             onClick={() => setIdx((i) => (i - 1 + photos.length) % photos.length)}
-            className="absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 text-white hover:bg-black/70 transition-colors"
+            className="absolute left-2 top-1/2 -translate-y-1/2 p-2 sm:p-1 bg-black/50 text-white hover:bg-black/70 transition-colors"
             aria-label="Foto anterior"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -42,7 +42,7 @@ function PhotoCarousel({ photos, nombre, onClose }: {
           </button>
           <button
             onClick={() => setIdx((i) => (i + 1) % photos.length)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 text-white hover:bg-black/70 transition-colors"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 sm:p-1 bg-black/50 text-white hover:bg-black/70 transition-colors"
             aria-label="Foto siguiente"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -118,7 +118,7 @@ export default function AmenityDetailPanel({ amenity, onClose }: AmenityDetailPa
             </span>
             <button
               onClick={onClose}
-              className="absolute top-3 right-3 p-1.5 bg-white/80 hover:bg-white transition-colors"
+              className="absolute top-2 right-2 p-2.5 sm:p-1.5 bg-white/80 hover:bg-white transition-colors"
               aria-label="Cerrar panel"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

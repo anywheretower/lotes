@@ -21,7 +21,7 @@ export default function Legend({ lots }: LegendProps) {
   const total = lots.length;
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
+    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
       <span className="text-xs font-medium text-neutral-900">
         {disponibles}/{total} disponibles
       </span>
@@ -29,7 +29,7 @@ export default function Legend({ lots }: LegendProps) {
       {statuses.map((status) => {
         const count = counts[status] || 0;
         return (
-          <div key={status} className="flex items-center gap-1.5">
+          <div key={status} className="hidden sm:flex items-center gap-1.5">
             <div
               className="w-2.5 h-2.5 rounded-full"
               style={{ backgroundColor: statusColors[status] }}
@@ -40,6 +40,17 @@ export default function Legend({ lots }: LegendProps) {
           </div>
         );
       })}
+      {/* Mobile: solo dots sin labels */}
+      <div className="flex sm:hidden items-center gap-1.5">
+        {statuses.map((status) => (
+          <div
+            key={status}
+            className="w-2 h-2 rounded-full"
+            style={{ backgroundColor: statusColors[status] }}
+            title={`${statusLabels[status]} (${counts[status] || 0})`}
+          />
+        ))}
+      </div>
     </div>
   );
 }

@@ -152,7 +152,7 @@ export default function LotDetailPanel({ lot, onClose }: LotDetailPanelProps) {
             </span>
             <button
               onClick={onClose}
-              className="absolute top-3 right-3 p-1.5 bg-white/80 hover:bg-white transition-colors"
+              className="absolute top-2 right-2 p-2.5 sm:p-1.5 bg-white/80 hover:bg-white transition-colors"
               aria-label="Cerrar panel"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -247,6 +247,18 @@ export default function LotDetailPanel({ lot, onClose }: LotDetailPanelProps) {
               </a>
             </div>
           )}
+
+          {/* Back to map — mobile only */}
+          <button
+            onClick={onClose}
+            className="lg:hidden flex items-center justify-center gap-2 w-full mt-3 border border-neutral-200 hover:border-neutral-900 text-neutral-600 hover:text-neutral-900 font-medium py-2.5 px-6 text-xs transition-colors"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            Volver al plano del condominio
+          </button>
         </div>
       </div>
     </>
@@ -279,7 +291,7 @@ function PhotoCarousel({ photos, lotId, statusColor, onClose }: {
         <>
           <button
             onClick={() => setIdx((i) => (i - 1 + photos.length) % photos.length)}
-            className="absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 text-white hover:bg-black/70 transition-colors"
+            className="absolute left-2 top-1/2 -translate-y-1/2 p-2 sm:p-1 bg-black/50 text-white hover:bg-black/70 transition-colors"
             aria-label="Foto anterior"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -288,7 +300,7 @@ function PhotoCarousel({ photos, lotId, statusColor, onClose }: {
           </button>
           <button
             onClick={() => setIdx((i) => (i + 1) % photos.length)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 text-white hover:bg-black/70 transition-colors"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 sm:p-1 bg-black/50 text-white hover:bg-black/70 transition-colors"
             aria-label="Foto siguiente"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
